@@ -26,8 +26,23 @@ def save_job(title, company, skills):
        )
        conn.commit()
        conn.close()
+def get_jobs():
+    conn = sqlite3.connect(DB_FILE)
+    rows = conn.execute("SELECT id, title, company, skills FROM jobs").fetchall()
+    conn.close()
+    jobs = []
+    for row in rows:
+        jobs.append(
+            {
+                "id": row[0],
+                "title": row[1],
+                "company": row[2],
+                "skills": json.loads(row[3]),
+            }
+        )
+    return jobs
 
 if __name__ == "__main__":
        init_db()
-       save_job("Test Engineer", "Test Co", ["Python", "SQL"])
-       print("Saved one test job")
+       for i in get_jobs():
+           print(i)
