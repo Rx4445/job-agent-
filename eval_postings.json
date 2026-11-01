@@ -22,5 +22,14 @@
       "company": "Orbit Labs",
       "skills": []
     }
+  },
+    {
+    "posting": "Project Role : Web Developer Project Role Description : Design, build and test web-based applications for various site components and edit site content. Document technical designs and specifications. Research and incorporate updated content for websites. Must have skills : .Net Full Stack Development Good to have skills : NA",
+    "expected": {
+      "title": "Web Developer",
+      "company": "Accenture",
+      "skills": [".Net Full Stack Development"]
+    }
   }
+  
 ]
