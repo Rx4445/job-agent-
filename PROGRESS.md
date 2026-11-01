@@ -32,3 +32,6 @@
 
 ## Session log
 - Oct 31: agy hit its quota (resets in ~3.5 days). Worked with Claude chat manually. Verified extract.py + test pass, ran FastAPI endpoint, committed everything. Deleted an empty typo'd file (est_main.py). Next: SQLite storage.
+
+   - extract.py has two copies of the retry loop: extract_job (sync) and async_extract_job (async). The app uses the async one, but test_extract.py tests the sync one. Fix: delete extract_job, update the __main__ block to use asyncio.run, and rewrite test_extract.py to test async_extract_job.
+   - PROGRESS.md says gemini-3.8-flash, but extract.py uses gemini-2.5-flash. Decide which to use and make them match.
