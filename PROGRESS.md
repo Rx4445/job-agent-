@@ -53,6 +53,7 @@ V1 checklist:
 - test_main.py shows an httpx deprecation warning (harmless for now)
 - save_job is a normal (blocking) function called from an async endpoint. Fine at this size.
 - I have not yet explained the retry loop in my own words (interview prep)
+- Eval baseline (4 postings, 1 run): title 4/4, company 4/4, skills 2/4. Skills over-extraction: model adds job duties and invents skills when none are listed. Results vary between runs (non-deterministic). Fix to try: tighten the prompt (in BOTH retry loops, after the duplicate is removed), then re-run.
 
 ## Session log
 - Oct 31: agy hit its quota. Worked with Claude chat manually. Verified extract.py + test pass, ran FastAPI endpoint, committed everything. Deleted an empty typo'd file (est_main.py).
