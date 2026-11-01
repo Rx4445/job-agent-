@@ -10,7 +10,8 @@ class TestMainAPI(unittest.TestCase):
         self.client = TestClient(app)
 
     @patch("main.async_extract_job", new_callable=AsyncMock)
-    def test_extract_endpoint(self, mock_extract):
+    @patch("main.save_job")
+    def test_extract_endpoint(self, mock_save, mock_extract):
         mock_extract.return_value = JobPosting(
             title="Backend Dev",
             company="Acme Corp",
@@ -26,6 +27,7 @@ class TestMainAPI(unittest.TestCase):
         self.assertEqual(response.json()["title"], "Backend Dev")
         self.assertEqual(response.json()["company"], "Acme Corp")
         self.assertEqual(response.json()["skills"], ["Python", "FastAPI"])
+        mock_save.assert_called_once_with("Backend Dev", "Acme Corp", ["Python", "FastAPI"])
 
 
 if __name__ == "__main__":
