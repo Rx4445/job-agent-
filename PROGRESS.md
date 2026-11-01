@@ -1,5 +1,23 @@
 # Job Application Agent: Progress
 
+## Progress
+Version 1 (working, tested, deployed app):  ████████░░░░  8/12  (67%)
+Full 12-stage roadmap:                      █░░░░░░░░░░░  ~1.5/12  (~12%)
+
+V1 checklist:
+[x] 1  Tools set up (git, Node, VS Code, agy)
+[x] 2  Python env, .gitignore, API key
+[x] 3  First extraction script
+[x] 4  Pydantic structured output
+[x] 5  Retry with backoff + test
+[x] 6  FastAPI endpoint + test
+[x] 7  SQLite: create, save, read
+[x] 8  Endpoint saves to the database (test mocks save_job)
+[ ] 9  Remove duplicate retry loop, async test (agy)
+[ ] 10 10 real postings + accuracy script
+[ ] 11 Push to GitHub
+[ ] 12 README + deploy
+
 ## Done
 - [x] Set up git, Node, VS Code
 - [x] Install Antigravity CLI and log in
@@ -10,28 +28,32 @@
 - [x] Pydantic schema + structured output (extract.py)
 - [x] Retry loop with exponential backoff for 503 errors + test (extract.py, test_extract.py)
 - [x] Async FastAPI /extract endpoint + test (main.py, test_main.py)
+- [x] SQLite storage: db.py (init_db, save_job, get_jobs); endpoint saves each extraction; test mocks save_job
 
 ## In progress
 - [ ] Nothing yet
 
 ## Next
-- [ ] Store results in SQLite
+- [ ] Clean up duplicate retry loop with agy (see Known issues)
 - [ ] 10 test postings + script that scores extraction accuracy
 - [ ] Push project to GitHub
+- [ ] README + deploy
 
 ## Decisions made
 - Python only (no Rust/TypeScript)
 - Build the agent loop by hand before using a framework
-- App model: gemini-3.8-flash via Google AI Studio free tier (fallbacks agy added are unverified)
+- App model: gemini-2.5-flash (what extract.py uses and what worked in the real end-to-end run). Earlier notes said gemini-3.8-flash, but the code never used it.
 - API key lives in .env, never in code
-- Tests use fast fake model replies where possible (to confirm in test_main.py)
+- Tests use mocks (fake model reply, fake save_job), so they are fast, free, and never touch the real database or Google
+- Database stores skills as JSON text in a TEXT column (json.dumps / json.loads)
+- Always use ? placeholders in SQL, never f-strings (SQL injection)
 
 ## Known issues
+- extract.py has two copies of the retry loop: extract_job (sync) and async_extract_job (async). The app uses the async one, but test_extract.py tests the sync one. Fix: delete extract_job, update the __main__ block to use asyncio.run, and rewrite test_extract.py to test async_extract_job.
 - test_main.py shows an httpx deprecation warning (harmless for now)
+- save_job is a normal (blocking) function called from an async endpoint. Fine at this size.
 - I have not yet explained the retry loop in my own words (interview prep)
 
 ## Session log
-- Oct 31: agy hit its quota (resets in ~3.5 days). Worked with Claude chat manually. Verified extract.py + test pass, ran FastAPI endpoint, committed everything. Deleted an empty typo'd file (est_main.py). Next: SQLite storage.
-
-   - extract.py has two copies of the retry loop: extract_job (sync) and async_extract_job (async). The app uses the async one, but test_extract.py tests the sync one. Fix: delete extract_job, update the __main__ block to use asyncio.run, and rewrite test_extract.py to test async_extract_job.
-   - PROGRESS.md says gemini-3.8-flash, but extract.py uses gemini-2.5-flash. Decide which to use and make them match.
+- Oct 31: agy hit its quota. Worked with Claude chat manually. Verified extract.py + test pass, ran FastAPI endpoint, committed everything. Deleted an empty typo'd file (est_main.py).
+- Nov 1: Built db.py. Endpoint now saves each extraction. Ran the full app end to end: real request, Gemini, validated JobPosting, saved to jobs.db, read back. Next: accuracy script with real postings, and the retry-loop cleanup once agy quota returns.
