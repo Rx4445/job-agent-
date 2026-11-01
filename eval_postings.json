@@ -1,0 +1,26 @@
+[
+  {
+    "posting": "Junior Backend Engineer at Acme Corp (Remote, India). We need Python, FastAPI, and SQL experience. 1-2 years preferred. Salary: 8-12 LPA.",
+    "expected": {
+      "title": "Junior Backend Engineer",
+      "company": "Acme Corp",
+      "skills": ["Python", "FastAPI", "SQL"]
+    }
+  },
+  {
+    "posting": "Zeta Ltd is hiring! Join our Bangalore team as a Data Analyst. You will build dashboards in Power BI and query data with SQL. Excel skills are a must.",
+    "expected": {
+      "title": "Data Analyst",
+      "company": "Zeta Ltd",
+      "skills": ["Power BI", "SQL", "Excel"]
+    }
+  },
+  {
+    "posting": "Senior Product Designer. Orbit Labs, Hyderabad. 5+ years of experience in product design. Strong portfolio required.",
+    "expected": {
+      "title": "Senior Product Designer",
+      "company": "Orbit Labs",
+      "skills": []
+    }
+  }
+]
