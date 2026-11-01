@@ -27,9 +27,57 @@
     "posting": "Project Role : Web Developer Project Role Description : Design, build and test web-based applications for various site components and edit site content. Document technical designs and specifications. Research and incorporate updated content for websites. Must have skills : .Net Full Stack Development Good to have skills : NA",
     "expected": {
       "title": "Web Developer",
-      "company": "Accenture",
+      "company": "",
       "skills": [".Net Full Stack Development"]
     }
+    
+  },{
+    "posting": "Backend Engineer at Finlytics (Pune). Requirements: Python, Django, PostgreSQL, Redis, Docker, Kubernetes, AWS, Git, REST APIs, CI/CD. 3+ years of experience.",
+    "expected": {
+      "title": "Backend Engineer",
+      "company": "Finlytics",
+      "skills": ["Python", "Django", "PostgreSQL", "Redis", "Docker", "Kubernetes", "AWS", "Git", "REST APIs", "CI/CD"]
+    }
+    },{
+    "posting": "Frontend Developer - Brightwave Technologies. We offer 12-18 LPA, health insurance, free lunch, and a learning budget of 50,000 per year. You will need React, TypeScript, and CSS. Nice to have: GraphQL. Hybrid in Chennai, 3 days a week in office. Apply by 15 December.",
+    "expected": {
+      "title": "Frontend Developer",
+      "company": "Brightwave Technologies",
+      "skills": ["React", "TypeScript", "CSS"]
+    }
+  },
+  {
+    "posting": "We are a fast-growing logistics startup based in Mumbai, and we are looking for a Machine Learning Engineer to join our team. You will work with Python, PyTorch, and SQL to build demand forecasting models. About us: RouteWise has grown from 5 to 80 people in two years.",
+    "expected": {
+      "title": "Machine Learning Engineer",
+      "company": "RouteWise",
+      "skills": ["Python", "PyTorch", "SQL"]
+    }
+  },
+  {
+    "posting": "Engineer II at Kestrel Systems (Noida). Skills needed: Java and Spring Boot. 4+ years of experience. Immediate joiners preferred.",
+    "expected": {
+      "title": "Engineer II",
+      "company": "Kestrel Systems",
+      "skills": ["Java", "Spring Boot"]
+    }
+  },
+  {
+    "posting": "Greenleaf Analytics is hiring a Business Intelligence Analyst. The ideal candidate is comfortable writing SQL and building reports in Tableau, and must have strong communication skills to work with non-technical stakeholders.",
+    "expected": {
+      "title": "Business Intelligence Analyst",
+      "company": "Greenleaf Analytics",
+      "skills": ["SQL", "Tableau"]
+    }
+  },
+  {
+    "posting": "hi! urgent opening for devops engineer at skyline infra, hyd. need terraform + aws + linux. pls share cvs asap",
+    "expected": {
+      "title": "DevOps Engineer",
+      "company": "Skyline Infra",
+      "skills": ["Terraform", "AWS", "Linux"]
+    }
   }
+  
   
 ]

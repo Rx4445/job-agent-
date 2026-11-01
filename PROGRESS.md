@@ -42,8 +42,7 @@ V1 checklist:
 ## Decisions made
 - Python only (no Rust/TypeScript)
 - Build the agent loop by hand before using a framework
-- App model: gemini-2.5-flash (what extract.py uses and what worked in the real end-to-end run). Earlier notes said gemini-3.8-flash, but the code never used it.
-- API key lives in .env, never in code
+- App model: gemini-3.6-flash via a Pro-account project key (free tier). gemini-2.5-flash is not available to new projects. gemini-3.8-flash hangs with no error and no response (seen with two different keys), so avoid it until understood.
 - Tests use mocks (fake model reply, fake save_job), so they are fast, free, and never touch the real database or Google
 - Database stores skills as JSON text in a TEXT column (json.dumps / json.loads)
 - Always use ? placeholders in SQL, never f-strings (SQL injection)
@@ -54,7 +53,12 @@ V1 checklist:
 - save_job is a normal (blocking) function called from an async endpoint. Fine at this size.
 - I have not yet explained the retry loop in my own words (interview prep)
 - Eval baseline (4 postings, 1 run): title 4/4, company 4/4, skills 2/4. Skills over-extraction: model adds job duties and invents skills when none are listed. Results vary between runs (non-deterministic). Fix to try: tighten the prompt (in BOTH retry loops, after the duplicate is removed), then re-run.
+- Eval, partial run on gemini-3.6-flash (6 of 10 cases, daily quota ran out): title 6/6, company 5/6, skills 4/6. Not a full baseline yet.
+- Prompt problems: model invents skills when none are listed (case 3, seen 3 times), and includes "nice to have" skills (case 6, GraphQL). Fix: tighten the prompt, then re-run.
+- Schema problem: company is a required string, so the model writes "Not specified" when a posting names none. Fix: make company optional.
+- async_extract_job has no timeout, so a hanging request waits forever. Retry loop only handles errors, not hangs. Also retries 429 quota errors, which cannot succeed.
 
 ## Session log
 - Oct 31: agy hit its quota. Worked with Claude chat manually. Verified extract.py + test pass, ran FastAPI endpoint, committed everything. Deleted an empty typo'd file (est_main.py).
 - Nov 1: Built db.py. Endpoint now saves each extraction. Ran the full app end to end: real request, Gemini, validated JobPosting, saved to jobs.db, read back. Next: accuracy script with real postings, and the retry-loop cleanup once agy quota returns.
+- Nov 2: Switched to a new API key (Pro-account project) after the free key hit its daily limit. Ran eval on 6 of 10 cases. Fixed case 4 answer key (the posting names no company). Next: finish the eval when quota resets, then agy cleanup (duplicate loop, timeout, 429 handling), then tighten the prompt.
