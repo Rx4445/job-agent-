@@ -1,4 +1,3 @@
-import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -22,46 +21,29 @@ Salary: 8-12 LPA. Apply by Nov 30.
 """
 
 
-def extract_job(posting: str, max_retries: int = 3) -> JobPosting:
+async def async_extract_job(posting: str, max_retries: int = 3) -> JobPosting:
     for attempt in range(max_retries):
         try:
-            response = client.models.generate_content(
+            response = await client.aio.models.generate_content(
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=JobPosting,
+                    http_options=types.HttpOptions(timeout=10000),
                 ),
-                model="gemini-2.5-flash",
+                model="gemini-3.6-flash",
                 contents=f"List the job title, company, and required skills from this posting:\n{posting}",
             )
             return response.parsed
         except Exception as e:
+            if getattr(e, "code", None) == 429 or "429" in str(e):
+                raise
             delay = 2 ** attempt
             print(f"[Attempt {attempt + 1}/{max_retries}] Error: {e}. Retrying in {delay}s...")
             if attempt == max_retries - 1:
                 raise
-            time.sleep(delay)
-async def async_extract_job(posting: str, max_retries: int = 3) -> JobPosting:                    
-        for attempt in range(max_retries):                                                            
-            try:                                                                                      
-                response = await client.aio.models.generate_content(                                  
-                    config=types.GenerateContentConfig(                                               
-                        response_mime_type="application/json",                                        
-                        response_schema=JobPosting,                                                   
-                    ),                                                                                
-                    model="gemini-3.6-flash",                                                         
-                    contents=f"List the job title, company, and required skills from this posting:\n{posting}",
-                )                                                                                     
-                return response.parsed                                                                
-            except Exception as e:                                                                    
-                delay = 2 ** attempt                                                                  
-                print(f"[Attempt {attempt + 1}/{max_retries}] Error: {e}. Retrying in {delay}s...")   
-                if attempt == max_retries - 1:                                                        
-                    raise                                                                             
-                await asyncio.sleep(delay) 
+            await asyncio.sleep(delay)
 
-    
-    
 
 if __name__ == "__main__":
-    result = extract_job(posting)
+    result = asyncio.run(async_extract_job(posting))
     print("Extracted Result:", result)

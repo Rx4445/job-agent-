@@ -1,6 +1,6 @@
 # Project rules
 - I'm building this to learn and get hired as an Agentic AI Engineer. Explain each step before I do it.
-- Give me one step at a time. Wait for me to confirm before the next.
+- Work in meaningful chunks, but stop before committing. Show me the diff and the test results, and explain each change in simple terms. Never commit without my confirmation.
 - Let me write the core logic myself. Give hints first, code only if I'm stuck.
 - After each feature, quiz me with 2-3 questions on how it works.
 - Build the agent loop by hand before using any framework.
