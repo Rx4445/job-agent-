@@ -1,8 +1,8 @@
 # Job Application Agent: Progress
 
 ## Progress
-Version 1 (working, tested, deployed app):  ██████████░░  10/12  (83%)
-Full 12-stage roadmap:                      █░░░░░░░░░░░  ~1.8/12  (~15%)
+Version 1 (working, tested, deployed app):  ████████████  12/12  (100%) 🎉
+Full 12-stage roadmap:                      ██░░░░░░░░░░  ~2.0/12  (~17%)
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -15,8 +15,8 @@ V1 checklist:
 [x] 8  Endpoint saves to the database (test mocks save_job)
 [x] 9  Remove duplicate retry loop, async test (agy)
 [x] 10 10 real postings + accuracy script
-[ ] 11 Push to GitHub
-[ ] 12 README + deploy
+[x] 11 Push to GitHub
+[x] 12 README + deploy
 
 ## Done
 - [x] Set up git, Node, VS Code
@@ -31,13 +31,15 @@ V1 checklist:
 - [x] SQLite storage: db.py (init_db, save_job, get_jobs); endpoint saves each extraction; test mocks save_job
 - [x] Clean up duplicate retry loop in extract.py: unified on async_extract_job, added 10s request timeout, fail-fast on 429 quota errors, and updated test_extract.py with IsolatedAsyncioTestCase and AsyncMock
 - [x] 10-case evaluation set (eval_postings.json) and accuracy script (eval.py) with rate-limit pacing and per-case error handling. Completed full 10-case baseline (Title 10/10, Company 9/10, Skills 7/10).
+- [x] Connected remote GitHub repository (https://github.com/Rx4445/job-agent-) and pushed main branch.
+- [x] Created comprehensive README.md, requirements.txt, and .env.example documenting architecture, retry mechanics, evals, and deployment instructions.
 
 ## In progress
-- [ ] Nothing yet
+- [ ] Version 1 is complete! Ready to plan Stage 2 (resume tailoring / matching).
 
 ## Next
-- [ ] Push project to GitHub
-- [ ] README + deploy
+- [ ] Stage 2: Resume parsing, job-to-resume matching, and qualification scoring.
+- [ ] (Optional) Cloud deploy FastAPI container (Render, Railway, or Fly.io).
 
 ## Decisions made
 - Python only (no Rust/TypeScript)
@@ -62,4 +64,5 @@ V1 checklist:
 - Nov 1: Built db.py. Endpoint now saves each extraction. Ran the full app end to end: real request, Gemini, validated JobPosting, saved to jobs.db, read back. Next: accuracy script with real postings, and the retry-loop cleanup once agy quota returns.
 - Nov 2: Switched to a new API key (Pro-account project) after the free key hit its daily limit. Ran eval on 6 of 10 cases. Fixed case 4 answer key (the posting names no company). Next: finish the eval when quota resets, then agy cleanup (duplicate loop, timeout, 429 handling), then tighten the prompt.
 - Nov 4: Cleaned up duplicate retry loop in extract.py: removed sync extract_job, unified on async_extract_job with asyncio.run() entry point, added 10s timeout via types.HttpOptions, added fail-fast 429 quota handling. Rewrote test_extract.py with IsolatedAsyncioTestCase and AsyncMock testing 503 retry, 3-attempt exhaustion, and 429 immediate exit. All 5 tests passing. Updated docs/retry_loop.md.
-- Nov 5: Completed full 10-case baseline on gemini-3.6-flash: Title 10/10 (100%), Company 9/10 (90%), Skills 7/10 (70%). Aligned eval with product goals: prioritized skill recall (including nice-to-have/soft skills) and accepted "Not specified" for missing company names. Updated eval.py and eval_postings.json with rate-limit pacing and per-case error handling. Discovered free tier limits: 5 RPM, 20 RPD. Marked Step 10 complete.
+- Nov 5: Completed full 10-case baseline on gemini-3.6-flash: Title 10/10 (100%), Company 9/10 (90%), Skills 7/10 (70%). Aligned eval with product goals: prioritized skill recall (including nice-to-have/soft skills) and accepted "Not specified" for missing company names. Updated eval.py and eval_postings.json with rate-limit pacing and per-case error handling. Discovered free tier limits: 5 RPM, 20 RPD. Linked remote repo and successfully pushed main to GitHub (https://github.com/Rx4445/job-agent-).
+- Nov 5: Completed Step 12 (README.md, requirements.txt, .env.example). Version 1 of Job Application Agent is 100% complete!
