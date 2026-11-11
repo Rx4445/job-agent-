@@ -2,7 +2,7 @@
 
 ## Progress
 Version 1 (working, tested, deployed app):  ████████████  12/12  (100%) 🎉
-Full 12-stage roadmap:                      ███░░░░░░░░░  ~2.5/12  (~21%)
+Full 12-stage roadmap:                      ███░░░░░░░░░  ~2.8/12  (~23%)
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -23,7 +23,7 @@ Stage 2 checklist (Resume Parsing & Match Scoring):
 [x] 2 Unit tests for resume extraction with mock retries (test_resume.py)
 [x] 3 Match & gap analysis engine with 3-layer role alignment (matcher.py)
 [x] 4 Unit tests covering matching edge cases (test_matcher.py)
-[ ] 5 Expose matching via FastAPI endpoint POST /match (main.py, test_main.py)
+[x] 5 Expose matching via FastAPI endpoint POST /match (main.py, test_main.py)
 [ ] 6 Batch matching against saved SQLite database jobs
 
 ## Done
@@ -41,14 +41,14 @@ Stage 2 checklist (Resume Parsing & Match Scoring):
 - [x] 10-case evaluation set (eval_postings.json) and accuracy script (eval.py) with rate-limit pacing and per-case error handling. Completed full 10-case baseline (Title 10/10, Company 9/10, Skills 7/10).
 - [x] Connected remote GitHub repository (https://github.com/Rx4445/job-agent-) and pushed main branch.
 - [x] Created comprehensive README.md, requirements.txt, and .env.example documenting architecture, retry mechanics, evals, and deployment instructions.
-- [x] Implemented Stage 2 core: Resume schema (`resume.py`), async extraction, unit tests (`test_resume.py`), deterministic matching engine (`matcher.py`), and test suite (`test_matcher.py`). All 13 tests passing.
+- [x] Implemented Stage 2 core: Resume schema (`resume.py`), async extraction, unit tests (`test_resume.py`), deterministic matching engine (`matcher.py`), and test suite (`test_matcher.py`).
+- [x] Exposed matching via FastAPI `POST /match` endpoint in `main.py` and added automated test in `test_main.py`. All 14 tests passing.
 
 ## In progress
-- [ ] Stage 2: Hooking matching engine into FastAPI (`POST /match`).
+- [ ] Stage 2: Batch matching against saved SQLite database jobs.
 
 ## Next
-- [ ] Connect matching engine to FastAPI `POST /match` endpoint in `main.py`
-- [ ] Auto-match resume against all jobs in `jobs.db`
+- [ ] Add batch matching endpoint `POST /match-all` comparing a resume against all jobs in `jobs.db`
 - [ ] Stage 3: Cover letter & application generation
 
 ## Decisions made
@@ -78,4 +78,4 @@ Stage 2 checklist (Resume Parsing & Match Scoring):
 - Nov 4: Cleaned up duplicate retry loop in extract.py: removed sync extract_job, unified on async_extract_job with asyncio.run() entry point, added 10s timeout via types.HttpOptions, added fail-fast 429 quota handling. Rewrote test_extract.py with IsolatedAsyncioTestCase and AsyncMock testing 503 retry, 3-attempt exhaustion, and 429 immediate exit. All 5 tests passing. Updated docs/retry_loop.md.
 - Nov 5: Completed full 10-case baseline on gemini-3.6-flash: Title 10/10 (100%), Company 9/10 (90%), Skills 7/10 (70%). Aligned eval with product goals: prioritized skill recall (including nice-to-have/soft skills) and accepted "Not specified" for missing company names. Updated eval.py and eval_postings.json with rate-limit pacing and per-case error handling. Discovered free tier limits: 5 RPM, 20 RPD. Linked remote repo and successfully pushed main to GitHub (https://github.com/Rx4445/job-agent-).
 - Nov 5: Completed Step 12 (README.md, requirements.txt, .env.example). Version 1 of Job Application Agent is 100% complete!
-- Nov 6-11: Built Stage 2 core: Candidate schema & async extraction with retry loop (resume.py), unit tests (test_resume.py), deterministic matching & gap analysis engine (matcher.py), and 5 edge-case unit tests (test_matcher.py). All 13 tests passing. Documented matching approach in docs/matcher.md.
+- Nov 6-11: Built Stage 2 core: Candidate schema & async extraction with retry loop (resume.py), unit tests (test_resume.py), deterministic matching & gap analysis engine (matcher.py), and 5 edge-case unit tests (test_matcher.py). Connected matching engine to FastAPI via POST /match endpoint in main.py, added test in test_main.py. All 14 tests passing.
