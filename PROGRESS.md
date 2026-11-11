@@ -2,7 +2,7 @@
 
 ## Progress
 Version 1 (working, tested, deployed app):  ████████████  12/12  (100%) 🎉
-Full 12-stage roadmap:                      ██░░░░░░░░░░  ~2.0/12  (~17%)
+Full 12-stage roadmap:                      ███░░░░░░░░░  ~2.5/12  (~21%)
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -17,6 +17,14 @@ V1 checklist:
 [x] 10 10 real postings + accuracy script
 [x] 11 Push to GitHub
 [x] 12 README + deploy
+
+Stage 2 checklist (Resume Parsing & Match Scoring):
+[x] 1 Resume schema & async extraction with retry loop (resume.py)
+[x] 2 Unit tests for resume extraction with mock retries (test_resume.py)
+[x] 3 Match & gap analysis engine with 3-layer role alignment (matcher.py)
+[x] 4 Unit tests covering matching edge cases (test_matcher.py)
+[ ] 5 Expose matching via FastAPI endpoint POST /match (main.py, test_main.py)
+[ ] 6 Batch matching against saved SQLite database jobs
 
 ## Done
 - [x] Set up git, Node, VS Code
@@ -33,13 +41,15 @@ V1 checklist:
 - [x] 10-case evaluation set (eval_postings.json) and accuracy script (eval.py) with rate-limit pacing and per-case error handling. Completed full 10-case baseline (Title 10/10, Company 9/10, Skills 7/10).
 - [x] Connected remote GitHub repository (https://github.com/Rx4445/job-agent-) and pushed main branch.
 - [x] Created comprehensive README.md, requirements.txt, and .env.example documenting architecture, retry mechanics, evals, and deployment instructions.
+- [x] Implemented Stage 2 core: Resume schema (`resume.py`), async extraction, unit tests (`test_resume.py`), deterministic matching engine (`matcher.py`), and test suite (`test_matcher.py`). All 13 tests passing.
 
 ## In progress
-- [ ] Version 1 is complete! Ready to plan Stage 2 (resume tailoring / matching).
+- [ ] Stage 2: Hooking matching engine into FastAPI (`POST /match`).
 
 ## Next
-- [ ] Stage 2: Resume parsing, job-to-resume matching, and qualification scoring.
-- [ ] (Optional) Cloud deploy FastAPI container (Render, Railway, or Fly.io).
+- [ ] Connect matching engine to FastAPI `POST /match` endpoint in `main.py`
+- [ ] Auto-match resume against all jobs in `jobs.db`
+- [ ] Stage 3: Cover letter & application generation
 
 ## Decisions made
 - Python only (no Rust/TypeScript)
@@ -53,6 +63,8 @@ V1 checklist:
 - Product decision on skill recall: Accept nice-to-have, soft skills, and implied role skills in extraction because capturing them provides valuable context for a job seeker.
 - Company normalization: Treat "Not specified", "N/A", and "" as equivalent matches in evals when no company is in the posting.
 - Gemini 3.6-flash free tier limits: 5 requests per minute (RPM) and 20 requests per day (RPD). Evals must pace calls (13s delay) and avoid excessive retries.
+- Deterministic set matching: Used pure Python set operations (`&`, `-`) for skill matching and gap identification (instant, zero-cost, reproducible).
+- 3-layer role alignment: Used substring, reverse substring, and token overlap to match titles across wording variations.
 
 ## Known issues
 - test_main.py shows an httpx deprecation warning (harmless for now)
@@ -66,3 +78,4 @@ V1 checklist:
 - Nov 4: Cleaned up duplicate retry loop in extract.py: removed sync extract_job, unified on async_extract_job with asyncio.run() entry point, added 10s timeout via types.HttpOptions, added fail-fast 429 quota handling. Rewrote test_extract.py with IsolatedAsyncioTestCase and AsyncMock testing 503 retry, 3-attempt exhaustion, and 429 immediate exit. All 5 tests passing. Updated docs/retry_loop.md.
 - Nov 5: Completed full 10-case baseline on gemini-3.6-flash: Title 10/10 (100%), Company 9/10 (90%), Skills 7/10 (70%). Aligned eval with product goals: prioritized skill recall (including nice-to-have/soft skills) and accepted "Not specified" for missing company names. Updated eval.py and eval_postings.json with rate-limit pacing and per-case error handling. Discovered free tier limits: 5 RPM, 20 RPD. Linked remote repo and successfully pushed main to GitHub (https://github.com/Rx4445/job-agent-).
 - Nov 5: Completed Step 12 (README.md, requirements.txt, .env.example). Version 1 of Job Application Agent is 100% complete!
+- Nov 6-11: Built Stage 2 core: Candidate schema & async extraction with retry loop (resume.py), unit tests (test_resume.py), deterministic matching & gap analysis engine (matcher.py), and 5 edge-case unit tests (test_matcher.py). All 13 tests passing. Documented matching approach in docs/matcher.md.
