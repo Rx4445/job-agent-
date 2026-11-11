@@ -1,8 +1,8 @@
 # Job Application Agent
 
-A production-grade, async job extraction pipeline that converts messy, unstructured job postings into validated, structured data using Google Gemini, Pydantic, FastAPI, and SQLite.
+A production-grade, async job extraction and candidate matching pipeline that converts messy, unstructured job postings and resumes into validated, structured data using Google Gemini, Pydantic, FastAPI, and SQLite.
 
-Built from **first principles** in pure Python (without heavy orchestration frameworks like LangChain) to master resilient agent architectures, constrained decoding, and automated evaluations.
+Built from **first principles** in pure Python (without heavy orchestration frameworks like LangChain) to master resilient agent architectures, constrained decoding, deterministic matching, and automated evaluations.
 
 ---
 
@@ -10,19 +10,35 @@ Built from **first principles** in pure Python (without heavy orchestration fram
 
 ```mermaid
 flowchart TD
-    A["Raw Job Posting (Text)"] --> B["FastAPI /extract Endpoint"]
-    B --> C["async_extract_job()"]
-    
-    subgraph Agent Loop & Error Handling
-        C --> D{"Gemini 3.6 Flash"}
-        D -- "503 Spike / Timeout" --> E["Exponential Backoff (1s, 2s, 4s)"]
-        E --> D
-        D -- "429 Quota Exhausted" --> F["Fail Fast (Immediate Raise)"]
-        D -- "Success (JSON Schema)" --> G["Pydantic Validation (JobPosting)"]
+    subgraph Inputs
+        A["Raw Job Posting (Text)"]
+        R["Raw Candidate Resume (Text)"]
     end
-    
-    G --> H[("SQLite Storage (jobs.db)")]
-    G --> I["JSON API Response"]
+
+    subgraph API Layer ["FastAPI Service"]
+        B["/extract"]
+        M["/match"]
+        MA["/match-all"]
+    end
+
+    A --> B
+    A & R --> M
+    R --> MA
+
+    subgraph Extraction Pipeline
+        B --> C1["async_extract_job()"]
+        M --> C1 & C2["async_extract_resume()"]
+        MA --> C2
+    end
+
+    subgraph Storage & Matching
+        C1 --> DB[("SQLite Database (jobs.db)")]
+        C1 & C2 --> MATCH["Deterministic Matcher (matcher.py)"]
+        DB --> MA
+        MA --> MATCH
+    end
+
+    MATCH --> OUT["Ranked Match Results (Score %, Gaps, Recommendation)"]
 ```
 
 ---
@@ -30,14 +46,28 @@ flowchart TD
 ## Key Engineering Highlights
 
 - **First-Principles Agent Loop:** Built manual retry logic with exponential backoff and jitter readiness instead of relying on opaque framework wrappers.
-- **Structured Outputs (Constrained Decoding):** Enforces a strict Pydantic schema (`JobPosting`) at the model level via `response_mime_type="application/json"` and `response_schema`.
+- **Structured Outputs (Constrained Decoding):** Enforces strict Pydantic schemas (`JobPosting`, `Resume`, `MatchResult`) at the model level via `response_mime_type="application/json"` and `response_schema`.
 - **Intelligent Error Handling:**
   - **Transient Errors (503 / Timeouts):** Automatically retried with non-blocking `await asyncio.sleep(delay)`.
   - **Hard Quotas (429):** Fails fast immediately to avoid wasteful pauses when daily limits are reached.
   - **Zombie Call Prevention:** 10-second request timeout configured via `google.genai.types.HttpOptions(timeout=10000)`.
-- **Async Concurrency:** Fully asynchronous pipeline using `asyncio` to prevent event-loop blocking under high traffic.
+- **Deterministic Match & Gap Engine:** 
+  - Pure Python set operations (`&` for matching skills, `-` for skill gaps).
+  - 3-layer role alignment (substring, reverse substring, keyword overlap).
+  - Case-insensitive comparison with original casing preserved for presentation.
+- **Batch Leaderboard Ranking (`/match-all`):** Parses resume once and instantly ranks all stored SQLite jobs by match percentage in pure Python (<2ms).
 - **SQL Injection Safe Storage:** SQLite persistence using parameterized queries and JSON serialization for skill lists.
 - **Automated 10-Case Evaluation Harness:** Includes a dedicated benchmark (`eval.py` + `eval_postings.json`) testing accuracy across messy, edge-case job postings with rate-limit pacing.
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/extract` | Ingests raw job posting text, extracts structured JSON, and saves to SQLite |
+| `POST` | `/match` | Ingests job posting + candidate resume, extracts both, and returns detailed match score and skill gaps |
+| `POST` | `/match-all` | Ingests candidate resume and returns a ranked leaderboard of all stored SQLite jobs from best to worst fit |
 
 ---
 
@@ -86,7 +116,7 @@ The server will start at `http://127.0.0.1:8000`. You can test endpoints interac
 ## Running Tests & Evaluations
 
 ### Run Unit Tests (Fast & Free)
-All unit tests mock external API calls and time delays, running in milliseconds:
+All 15 unit tests mock external API calls and time delays, running in ~0.1s:
 ```powershell
 python -m unittest
 ```
@@ -102,16 +132,21 @@ python eval.py
 ## Project Structure
 
 ```text
-├── main.py              # FastAPI application and endpoint routing
-├── extract.py           # Gemini extraction logic, Pydantic schema & retry loop
+├── main.py              # FastAPI application, endpoints (/extract, /match, /match-all)
+├── extract.py           # Gemini job extraction logic, Pydantic schema & retry loop
+├── resume.py            # Gemini resume extraction logic & Candidate schema
+├── matcher.py           # Deterministic matching & gap analysis engine
 ├── db.py                # SQLite database connection, table initialization & queries
 ├── eval.py              # Evaluation script scoring extraction accuracy
 ├── eval_postings.json   # 10 ground-truth test cases for model evaluation
 ├── test_main.py         # Unit tests for the FastAPI API endpoints
-├── test_extract.py      # Async unit tests for the retry loop & error handling
+├── test_extract.py      # Async unit tests for job extraction retry loop
+├── test_resume.py       # Async unit tests for resume extraction retry loop
+├── test_matcher.py      # Unit tests for matching engine edge cases
 ├── docs/                # Feature documentation & design decisions
 │   ├── retry_loop.md    # Architecture of manual retry & error handling
-│   └── evals.md         # Evaluation harness & baseline documentation
+│   ├── evals.md         # Evaluation harness & baseline documentation
+│   └── matcher.md       # Matching methodology & set theory documentation
 ├── requirements.txt     # Python project dependencies
 ├── .env.example         # Template for environment variables
 └── PROGRESS.md          # Project roadmap tracking
