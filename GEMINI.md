@@ -11,3 +11,5 @@
 - After each completed step, update PROGRESS.md.
 - After finishing a feature, write or update docs/<feature>.md with the approach, decisions, and how to test it.
 - Never put secrets or API keys in files.
+- At the start of every session / log-on, give a rough target estimate of what should ideally be accomplished in the session (e.g., 2-hour benchmark) to calibrate speed and growth.
+- Whenever I say I'm logging off, review what was accomplished vs what was expected.

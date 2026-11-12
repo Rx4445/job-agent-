@@ -116,6 +116,94 @@ class TestMainAPI(unittest.TestCase):
         self.assertEqual(data[2]["match"]["match_score"], 0.0)
         self.assertFalse(data[2]["match"]["is_recommended"])
 
+    @patch("main.async_generate_cover_letter", new_callable=AsyncMock)
+    @patch("main.async_extract_resume", new_callable=AsyncMock)
+    @patch("main.async_extract_job", new_callable=AsyncMock)
+    @patch("main.save_job")
+    def test_cover_letter_with_posting_text(
+        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter
+    ):
+        mock_extract_job.return_value = JobPosting(
+            title="AI Systems Engineer",
+            company="Anthropic Labs",
+            skills=["Python", "FastAPI", "Vector DBs"],
+        )
+        mock_extract_resume.return_value = Resume(
+            name="Aarya Pradhan",
+            experience_years=2,
+            field="AI Engineering",
+            skills=["Python", "FastAPI"],
+        )
+        mock_generate_letter.return_value = "Dear Anthropic Team, ..."
+
+        response = self.client.post(
+            "/cover-letter",
+            json={
+                "posting": "Looking for an AI Systems Engineer with Python and FastAPI...",
+                "resume": "Aarya Pradhan. Built RAG with Python...",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["cover_letter"], "Dear Anthropic Team, ...")
+        self.assertEqual(data["match"]["matching_skills"], ["Python", "FastAPI"])
+        self.assertEqual(data["match"]["missing_skills"], ["Vector DBs"])
+        mock_save.assert_called_once()
+        mock_generate_letter.assert_called_once()
+
+    @patch("main.async_generate_cover_letter", new_callable=AsyncMock)
+    @patch("main.async_extract_resume", new_callable=AsyncMock)
+    @patch("main.get_jobs")
+    def test_cover_letter_with_job_id(
+        self, mock_get_jobs, mock_extract_resume, mock_generate_letter
+    ):
+        mock_get_jobs.return_value = [
+            {
+                "id": 42,
+                "title": "ML Engineer",
+                "company": "DeepMind",
+                "skills": ["Python", "PyTorch"],
+            }
+        ]
+        mock_extract_resume.return_value = Resume(
+            name="Aarya Pradhan",
+            experience_years=2,
+            field="Machine Learning",
+            skills=["Python"],
+        )
+        mock_generate_letter.return_value = "Dear DeepMind, ..."
+
+        response = self.client.post(
+            "/cover-letter",
+            json={"job_id": 42, "resume": "Aarya Pradhan..."},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["cover_letter"], "Dear DeepMind, ...")
+        self.assertEqual(data["match"]["matching_skills"], ["Python"])
+        self.assertEqual(data["match"]["missing_skills"], ["PyTorch"])
+
+    @patch("main.get_jobs")
+    def test_cover_letter_job_id_not_found(self, mock_get_jobs):
+        mock_get_jobs.return_value = []
+        response = self.client.post(
+            "/cover-letter",
+            json={"job_id": 999, "resume": "Aarya Pradhan..."},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("not found in database", response.json()["detail"])
+
+    def test_cover_letter_missing_posting_and_job_id(self):
+        response = self.client.post(
+            "/cover-letter",
+            json={"resume": "Aarya Pradhan..."},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Provide either posting text or a valid job_id", response.json()["detail"])
+
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -3,7 +3,8 @@
 ## Progress
 Version 1 (working, tested, deployed app):  ████████████  12/12  (100%) 🎉
 Stage 2 (Resume & Match Engine):           ████████████  6/6    (100%) 🎉
-Full 12-stage roadmap:                      ████░░░░░░░░  ~3.0/12  (~25%)
+Stage 3 (Cover Letter & Application Gen):   ████████████  5/5    (100%) 🎉
+Full 12-stage roadmap:                      █████░░░░░░░  ~4.0/12  (~33%)
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -27,6 +28,13 @@ Stage 2 checklist (Resume Parsing & Match Scoring):
 [x] 5 Expose matching via FastAPI endpoint POST /match (main.py, test_main.py)
 [x] 6 Batch matching against saved SQLite database jobs POST /match-all (main.py, test_main.py)
 
+Stage 3 checklist (Cover Letter & Tailored Application Generation):
+[x] 1 Anti-AI recruiter prompt design & strict grounding logic (generator.py)
+[x] 2 Async cover letter generation with 10s timeout, 503 backoff, and 429 fail-fast (generator.py)
+[x] 3 Unit test suite for generator edge cases and prompt synthesis (test_generator.py)
+[x] 4 Expose via FastAPI POST /cover-letter supporting raw text, job_id, and resume.md fallback (main.py, test_main.py)
+[x] 5 Technical architecture and verification documentation (docs/cover_letter.md)
+
 ## Done
 - [x] Set up git, Node, VS Code
 - [x] Install Antigravity CLI and log in
@@ -44,13 +52,15 @@ Stage 2 checklist (Resume Parsing & Match Scoring):
 - [x] Created comprehensive README.md, requirements.txt, and .env.example documenting architecture, retry mechanics, evals, and deployment instructions.
 - [x] Implemented Stage 2 core: Resume schema (`resume.py`), async extraction, unit tests (`test_resume.py`), deterministic matching engine (`matcher.py`), and test suite (`test_matcher.py`).
 - [x] Exposed single matching via FastAPI `POST /match` and batch ranking against SQLite jobs via `POST /match-all`. Added unit tests in `test_main.py`. All 15 tests passing.
+- [x] Built Stage 3: Cover letter generator (`generator.py`) with anti-AI persona and strict project grounding, unit tests (`test_generator.py`), and dual-mode FastAPI endpoint `POST /cover-letter` with `resume.md` fallback. All 24 tests passing.
 
 ## In progress
-- [ ] Stage 2 is complete! Ready to plan Stage 3 (Cover letter & tailored application generation).
+- [ ] Stage 3 complete! Ready to start Stage 4 (Autonomous CLI Agent Loop).
 
 ## Next
-- [ ] Stage 3: Cover letter & application generation (customized to job skills and candidate experience)
+- [ ] Stage 4: Interactive, multi-step CLI Agent Loop (`agent.py`) orchestrating ingestion -> match evaluation -> human gate -> cover letter generation.
 - [ ] Multi-agent orchestration loop
+
 
 ## Decisions made
 - Python only (no Rust/TypeScript)
@@ -82,3 +92,4 @@ Stage 2 checklist (Resume Parsing & Match Scoring):
 - Nov 5: Completed Step 12 (README.md, requirements.txt, .env.example). Version 1 of Job Application Agent is 100% complete!
 - Nov 6-11: Built Stage 2: Resume schema & extraction (resume.py), unit tests (test_resume.py), matching engine (matcher.py), 5 test scenarios (test_matcher.py), POST /match endpoint, and POST /match-all batch ranking against SQLite database. All 15 tests passing.
 - Nov 11: Added `*.pdf` and `resume.md` to `.gitignore` to prevent binary/sensitive resume commits and avoid PDF parsing 400 errors. Created clean markdown template `resume.md` for text-based extraction and testing.
+- Nov 12: Built Stage 3 (Cover Letter Generation). Designed anti-AI recruiter prompt with strict grounding in candidate resume metrics. Created generator.py with 10s timeout, 503 backoff, and 429 fail-fast. Added test_generator.py (5 tests). Implemented POST /cover-letter in main.py supporting raw posting text, saved job_id, and resume.md fallback, plus 4 unit tests in test_main.py. All 24 tests passing. Documented in docs/cover_letter.md.
