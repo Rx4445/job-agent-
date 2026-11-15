@@ -22,7 +22,7 @@ async def async_extract_resume(resume_text: str, max_retries: int = 3) -> Resume
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=Resume,
-                    http_options=types.HttpOptions(timeout=10000),
+                    http_options=types.HttpOptions(timeout=30000),
                 ),
                 model="gemini-3.6-flash",
                 contents=f"Extract the candidate's name, total years of experience as an integer, primary professional field, and technical skills from this resume:\n{resume_text}",

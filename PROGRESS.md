@@ -4,7 +4,8 @@
 Version 1 (working, tested, deployed app):  ████████████  12/12  (100%) 🎉
 Stage 2 (Resume & Match Engine):           ████████████  6/6    (100%) 🎉
 Stage 3 (Cover Letter & Application Gen):   ████████████  5/5    (100%) 🎉
-Full 12-stage roadmap:                      █████░░░░░░░  ~4.0/12  (~33%)
+Stage 4 (Autonomous CLI Agent Loop):        ████████████  7/7    (100%) 🎉
+Full 12-stage roadmap:                      ██████░░░░░░  ~5.0/12  (~42%)
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -35,6 +36,15 @@ Stage 3 checklist (Cover Letter & Tailored Application Generation):
 [x] 4 Expose via FastAPI POST /cover-letter supporting raw text, job_id, and resume.md fallback (main.py, test_main.py)
 [x] 5 Technical architecture and verification documentation (docs/cover_letter.md)
 
+Stage 4 checklist (Autonomous CLI Agent Loop):
+[x] 1 AgentState dataclass with execution audit logs (agent.py)
+[x] 2 Multi-step tool orchestration across extract, match, generate, and persist (agent.py)
+[x] 3 Human-in-the-Loop (HITL) decision gate with auto-approval, review, and warning paths (agent.py)
+[x] 4 Complete application packet persistence in applications/ with gitignore protection (agent.py)
+[x] 5 Unit test suite covering all decision branches, aborts, and error handling (test_agent.py)
+[x] 6 Technical architecture and state machine documentation (docs/agent_loop.md)
+[x] 7 Content-addressable SHA-256 resume caching layer in SQLite (db.py, test_db.py)
+
 ## Done
 - [x] Set up git, Node, VS Code
 - [x] Install Antigravity CLI and log in
@@ -53,12 +63,14 @@ Stage 3 checklist (Cover Letter & Tailored Application Generation):
 - [x] Implemented Stage 2 core: Resume schema (`resume.py`), async extraction, unit tests (`test_resume.py`), deterministic matching engine (`matcher.py`), and test suite (`test_matcher.py`).
 - [x] Exposed single matching via FastAPI `POST /match` and batch ranking against SQLite jobs via `POST /match-all`. Added unit tests in `test_main.py`. All 15 tests passing.
 - [x] Built Stage 3: Cover letter generator (`generator.py`) with anti-AI persona and strict project grounding, unit tests (`test_generator.py`), and dual-mode FastAPI endpoint `POST /cover-letter` with `resume.md` fallback. All 24 tests passing.
+- [x] Built Stage 4: Autonomous CLI Agent Loop (`agent.py`) in pure Python with state machine, Human-in-the-Loop decision gates, artifact generation, unit tests (`test_agent.py`), and docs (`docs/agent_loop.md`). All 29 tests passing.
+- [x] Built Candidate Profile SHA-256 Caching layer in `db.py` & `agent.py`: added `candidate_profile` table in SQLite, content-hashing via `compute_resume_hash`, cache-hit bypass (0ms execution, 0 tokens), and dedicated tests (`test_db.py`). All 38 tests passing in ~0.38s.
 
 ## In progress
-- [ ] Stage 3 complete! Ready to start Stage 4 (Autonomous CLI Agent Loop).
+- [ ] Stage 4 complete! Ready to start Stage 5 (Agent Evaluation Benchmark & Live CLI).
 
 ## Next
-- [ ] Stage 4: Interactive, multi-step CLI Agent Loop (`agent.py`) orchestrating ingestion -> match evaluation -> human gate -> cover letter generation.
+- [ ] Stage 5: Evaluation Benchmark for Agent Decisions & Live Interactive Testing.
 - [ ] Multi-agent orchestration loop
 
 
@@ -77,6 +89,7 @@ Stage 3 checklist (Cover Letter & Tailored Application Generation):
 - Deterministic set matching: Used pure Python set operations (`&`, `-`) for skill matching and gap identification (instant, zero-cost, reproducible).
 - 3-layer role alignment: Used substring, reverse substring, and token overlap to match titles across wording variations.
 - Batch SQLite ranking: `/match-all` pulls all stored jobs from database and ranks them in memory via Python sorting (`key=lambda x: x.match.match_score, reverse=True`).
+- Content-addressable resume caching: Hash `resume.md` via SHA-256 (`compute_resume_hash`). Match against `candidate_profile` table in `jobs.db` to bypass Gemini extraction on repeated runs (0ms latency, zero API quota consumed). Auto-refreshes when resume text changes.
 
 ## Known issues
 - test_main.py shows an httpx deprecation warning (harmless for now)
@@ -93,3 +106,5 @@ Stage 3 checklist (Cover Letter & Tailored Application Generation):
 - Nov 6-11: Built Stage 2: Resume schema & extraction (resume.py), unit tests (test_resume.py), matching engine (matcher.py), 5 test scenarios (test_matcher.py), POST /match endpoint, and POST /match-all batch ranking against SQLite database. All 15 tests passing.
 - Nov 11: Added `*.pdf` and `resume.md` to `.gitignore` to prevent binary/sensitive resume commits and avoid PDF parsing 400 errors. Created clean markdown template `resume.md` for text-based extraction and testing.
 - Nov 12: Built Stage 3 (Cover Letter Generation). Designed anti-AI recruiter prompt with strict grounding in candidate resume metrics. Created generator.py with 10s timeout, 503 backoff, and 429 fail-fast. Added test_generator.py (5 tests). Implemented POST /cover-letter in main.py supporting raw posting text, saved job_id, and resume.md fallback, plus 4 unit tests in test_main.py. All 24 tests passing. Documented in docs/cover_letter.md.
+- Nov 13: Built Stage 4 (Autonomous CLI Agent Loop). Designed AgentState with execution audit logs, multi-step tool orchestration (load resume -> extract job -> SQLite -> deterministic match -> decision gate -> cover letter -> persist packet). Implemented Human-in-the-Loop decision gate (auto-approve >=70%, prompt 50-69%, warn/abort <50%). Added test_agent.py (5 tests). All 29 tests passing. Documented in docs/agent_loop.md.
+- Nov 14: Added Content-Addressable SHA-256 Resume Profile Cache in `db.py` and `agent.py`. Integrated `candidate_profile` SQLite table with instant 0ms cache-hit bypass. Created `test_db.py` (5 tests) and updated `test_agent.py` to test cache hit and miss branches (7 tests). All 38 unit tests passing. Updated docs/agent_loop.md.

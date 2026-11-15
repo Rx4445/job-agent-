@@ -1,3 +1,4 @@
+import re
 from pydantic import BaseModel
 from extract import JobPosting
 from resume import Resume
@@ -11,6 +12,21 @@ class MatchResult(BaseModel):
     is_recommended: bool
 
 
+def is_skill_match(job_skill: str, candidate_skill: str) -> bool:
+    j = job_skill.lower().strip()
+    c = candidate_skill.lower().strip()
+
+    # 1. Exact match or Substring match (e.g. "python" in "python programming")
+    if j == c or j in c or c in j:
+        return True
+
+    # 2. Token / Keyword overlap (e.g. "RESTful APIs" vs "RESTful API design")
+    stopwords = {"or", "and", "the", "in", "of", "with"}
+    j_words = set(re.findall(r"\w+", j)) - stopwords
+    c_words = set(re.findall(r"\w+", c)) - stopwords
+    return bool(j_words & c_words)
+
+
 def match_job_and_resume(job: JobPosting, resume: Resume) -> MatchResult:
     # 1. Field/Domain alignment (checks substring or common role keywords)
     resume_words = set(resume.field.lower().split())
@@ -22,10 +38,14 @@ def match_job_and_resume(job: JobPosting, resume: Resume) -> MatchResult:
         or bool(resume_words & job_words)
     )
 
-    # 2. Skill overlap (case-insensitive)
-    candidate_skills = {s.strip().lower() for s in resume.skills}
-    matching_skills = [s for s in job.skills if s.strip().lower() in candidate_skills]
-    missing_skills = [s for s in job.skills if s.strip().lower() not in candidate_skills]
+    # 2. Skill overlap with multi-layer alignment
+    matching_skills = []
+    missing_skills = []
+    for js in job.skills:
+        if any(is_skill_match(js, cs) for cs in resume.skills):
+            matching_skills.append(js)
+        else:
+            missing_skills.append(js)
 
     # 3. Match score percentage
     if job.skills:
@@ -33,8 +53,8 @@ def match_job_and_resume(job: JobPosting, resume: Resume) -> MatchResult:
     else:
         match_score = 100.0
 
-    # 4. Recommendation threshold (60%+ skill match and field alignment)
-    is_recommended = field_match and match_score >= 60.0
+    # 4. Recommendation threshold (60%+ skill match with field alignment OR high skill match >= 75%)
+    is_recommended = (field_match or match_score >= 75.0) and match_score >= 60.0
 
     return MatchResult(
         field_match=field_match,

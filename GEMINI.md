@@ -11,5 +11,7 @@
 - After each completed step, update PROGRESS.md.
 - After finishing a feature, write or update docs/<feature>.md with the approach, decisions, and how to test it.
 - Never put secrets or API keys in files.
-- At the start of every session / log-on, give a rough target estimate of what should ideally be accomplished in the session (e.g., 2-hour benchmark) to calibrate speed and growth.
+- At the start of every session / log-on, give a rough target estimate of what should ideally be accomplished in the session (calibrated to weekday ~3hr or weekend full-day capacity) to calibrate speed and growth.
+- Session Logging & Debounce Rule: 15 minutes of inactivity marks an official log-off; any message after 15+ mins begins a new session. If user says log-off but keeps prompting within 15 mins, the session stays active.
+- Whenever a session logs off, log the session duration, accomplished vs expected velocity %, and update METRICS.md with visual trend charts.
 - Whenever I say I'm logging off, review what was accomplished vs what was expected.

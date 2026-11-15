@@ -77,6 +77,40 @@ class TestMatcher(unittest.TestCase):
         self.assertEqual(result.matching_skills, [])
         self.assertEqual(result.missing_skills, [])
 
+    def test_substring_skill_alignment(self):
+        job = JobPosting(
+            title="Backend Associate",
+            company="Startup Inc",
+            skills=["Python programming", "Docker or containerization"],
+        )
+        cand = Resume(
+            name="Aarya Pradhan",
+            experience_years=2,
+            field="AI Engineering",
+            skills=["Python", "Docker"],
+        )
+        result = match_job_and_resume(job, cand)
+        self.assertEqual(result.match_score, 100.0)
+        self.assertEqual(len(result.matching_skills), 2)
+        self.assertEqual(result.missing_skills, [])
+
+    def test_token_overlap_skill_alignment(self):
+        job = JobPosting(
+            title="AI Engineer",
+            company="Nexus AI",
+            skills=["RESTful API design", "Vector DBs (Chroma or FAISS)"],
+        )
+        cand = Resume(
+            name="Aarya Pradhan",
+            experience_years=2,
+            field="AI Engineering",
+            skills=["RESTful APIs", "Vector DBs (Chroma, FAISS)"],
+        )
+        result = match_job_and_resume(job, cand)
+        self.assertEqual(result.match_score, 100.0)
+        self.assertEqual(len(result.matching_skills), 2)
+
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,7 +14,8 @@ def build_cover_letter_prompt(job: JobPosting, match: MatchResult, resume_text: 
     missing_str = ", ".join(match.missing_skills) if match.missing_skills else "None"
     job_skills_str = ", ".join(job.skills) if job.skills else "General engineering"
 
-    return f"""You are a battle-tested technical recruiter who has reviewed thousands of applications and hates generic, buzzword-heavy AI cover letters. Your job is to draft a cover letter that sounds unmistakably human, direct, and slightly offbeat—cutting out all corporate fluff.
+    return f"""You are drafting a cold outreach cover letter from a sharp, ambitious software/AI engineer to an engineering hiring manager.
+The candidate speaks directly, peer-to-peer, with zero corporate fluff and complete self-awareness.
 
 Target Role: {job.title} at {job.company}
 Job Requirements: {job_skills_str}
@@ -26,11 +27,21 @@ Candidate Resume:
 {resume_text}
 
 STRICT WRITING RULES:
-1. VOICE & TONE: Write like a sharp, thoughtful human engineer speaking peer-to-peer. Never use AI clichés like "thrilled to apply", "testament to my passion", "in today's fast-paced world", or "aligns perfectly".
-2. STRICT GROUNDING: ONLY reference projects and metrics that appear explicitly on the candidate resume. Do NOT fabricate numbers, tools, or past roles.
-3. SKILL PROOF: For the matched skills ({matching_str}), pull the exact project from the resume that demonstrates it (e.g., citing specific metrics like latency, slide counts, or scale).
-4. GAP HONESTY: If addressing missing skills ({missing_str}), do not lie. Frame them with adjacent tools or high learning velocity.
-5. LENGTH: 3 short, punchy paragraphs. Clean Markdown.
+1. OPENING HOOK (HUMAN & SELF-AWARE):
+   - Start with a natural greeting: "Hi [Team / Hiring Manager at {job.company}],"
+   - Acknowledge this is a cold outreach and they get 10 of these an hour.
+   - Be refreshingly honest: acknowledge using AI to assist ("of course I used AI to help draft this—it would be stupid not to"), but note that you took the time to strip out all the monotonous buzzwords, clichés, and robotic corporate filler that usually makes recruiters throw out a resume.
+2. PROBLEM-TO-PROOF BRIDGE:
+   - Identify the actual engineering problem {job.company} is trying to solve with {job.title} based on requirements ({job_skills_str}).
+   - For the matched skills ({matching_str}), pull the exact project from the resume that demonstrates solving that type of problem (use exact metrics like document scale, slide counts, accuracy % gains, or latency numbers).
+3. GAP HONESTY:
+   - If addressing missing skills ({missing_str}), be completely upfront and honest. Don't claim to have run production clusters if you haven't. Frame them with related tools you use daily and rapid ramp-up ability.
+4. CLOSING:
+   - Close simply and directly: "You have real problems with [X], and I've built projects that solve those exact challenges. I'd appreciate any opportunity to chat and see if I can help the team."
+   - Sign off: "Best, [Candidate Name]".
+5. STRICT GROUNDING:
+   - NEVER invent projects, metrics, numbers, or past employers not in the resume.
+   - Keep it to 3-4 clean, punchy paragraphs in Markdown. Never use words like "delve", "tapestry", "moreover", "spearheaded", "testament", or "passion".
 """
 
 
@@ -46,7 +57,7 @@ async def async_generate_cover_letter(
         try:
             response = await client.aio.models.generate_content(
                 config=types.GenerateContentConfig(
-                    http_options=types.HttpOptions(timeout=10000),
+                    http_options=types.HttpOptions(timeout=30000),
                 ),
                 model="gemini-3.6-flash",
                 contents=prompt,
