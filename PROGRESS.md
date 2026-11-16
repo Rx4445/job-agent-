@@ -6,7 +6,8 @@ Stage 2 (Resume & Match Engine):           ████████████ 
 Stage 3 (Cover Letter & Application Gen):   ████████████  5/5    (100%) 🎉
 Stage 4 (Autonomous CLI Agent Loop):        ████████████  7/7    (100%) 🎉
 Stage 5 (Agent Evals & Interactive CLI):    ████████████  4/4    (100%) 🎉
-Full 12-stage roadmap:                      ████████░░░░  ~6.0/12  (~50%) 🚀
+Stage 6 (Batch Ingestion & Leaderboard):    ████████████  6/6    (100%) 🎉
+Full 12-stage roadmap:                      █████████░░░  ~7.0/12  (~58%) 🚀
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -52,6 +53,14 @@ Stage 5 checklist (Agent Decision Evals & Interactive CLI):
 [x] 3 Comprehensive unit test suite for CLI interaction and error handling (test_cli.py)
 [x] 4 Stage 5 evaluation and CLI documentation (docs/stage5_evals_cli.md)
 
+Stage 6 checklist (Batch Ingestion & Leaderboard Ranking):
+[x] 1 Multi-file directory scanner with extension filtering and deterministic sorting (scan_job_files)
+[x] 2 Batch evaluation and descending score ranking engine (evaluate_batch_jobs)
+[x] 3 Fixed-width ASCII Leaderboard terminal renderer (render_leaderboard)
+[x] 4 Batch application generator with selective and auto-dispatch (generate_batch_applications)
+[x] 5 Isolated unit test suite with mock coverage (test_batch.py)
+[x] 6 Technical architecture documentation (docs/batch_processing.md)
+
 ## Done
 - [x] Set up git, Node, VS Code
 - [x] Install Antigravity CLI and log in
@@ -73,12 +82,12 @@ Stage 5 checklist (Agent Decision Evals & Interactive CLI):
 - [x] Built Stage 4: Autonomous CLI Agent Loop (`agent.py`) in pure Python with state machine, Human-in-the-Loop decision gates, artifact generation, unit tests (`test_agent.py`), and docs (`docs/agent_loop.md`). All 29 tests passing.
 - [x] Built Candidate Profile SHA-256 Caching layer in `db.py` & `agent.py`: added `candidate_profile` table in SQLite, content-hashing via `compute_resume_hash`, cache-hit bypass (0ms execution, 0 tokens), and dedicated tests (`test_db.py`). All 38 tests passing in ~0.38s.
 - [x] Built Stage 5: Agent Decision Benchmark (`eval_agent.py`) with 100% gate accuracy and 100% gap recall, Interactive CLI Copilot (`cli.py`), and test suite (`test_cli.py`). All 46 tests passing in ~0.71s. Documented in `docs/stage5_evals_cli.md`.
+- [x] Built Stage 6: Batch Job Ingestion & Leaderboard Ranking (`batch.py`) with directory scanning, descending leaderboard table, interactive and headless application generation, and unit tests (`test_batch.py`). All 53 unit tests passing in ~0.64s. Documented in `docs/batch_processing.md`.
 
 ## In progress
-- [ ] Stage 5 complete! Ready for Stage 6 (Batch Processing & Job Board Ingestion).
+- [ ] Stage 6 complete! Ready for Stage 7 (Automated Web Scraping & Ingestion Loop).
 
 ## Next
-- [ ] Stage 6: Batch Job Processing, automated file ingestion & ranking.
 - [ ] Stage 7: Automated Web Scraping & Aggregation Loop (Greenhouse / Lever / LinkedIn).
 - [ ] Stage 8: Multi-Agent Specialization (Extractor Agent, Matcher Agent, Auditor Agent).
 
@@ -118,3 +127,4 @@ Stage 5 checklist (Agent Decision Evals & Interactive CLI):
 - Nov 13: Built Stage 4 (Autonomous CLI Agent Loop). Designed AgentState with execution audit logs, multi-step tool orchestration (load resume -> extract job -> SQLite -> deterministic match -> decision gate -> cover letter -> persist packet). Implemented Human-in-the-Loop decision gate (auto-approve >=70%, prompt 50-69%, warn/abort <50%). Added test_agent.py (5 tests). All 29 tests passing. Documented in docs/agent_loop.md.
 - Nov 14: Added Content-Addressable SHA-256 Resume Profile Cache in `db.py` and `agent.py`. Integrated `candidate_profile` SQLite table with instant 0ms cache-hit bypass. Created `test_db.py` (5 tests) and updated `test_agent.py` to test cache hit and miss branches (7 tests). All 38 unit tests passing. Updated docs/agent_loop.md.
 - Nov 15: Pushed Stage 4 commit `de97668` to GitHub. Built Stage 5: Agent Decision Benchmark (`eval_agent.py`) with 5 diverse scenarios (100% gate accuracy, 100% gap recall), Interactive Job Hunter CLI (`cli.py`), unit tests (`test_cli.py`), and documentation (`docs/stage5_evals_cli.md`). Total test suite grew to 46 unit tests passing in ~0.71s. Reached 50% milestone on 12-stage roadmap.
+- Nov 16 (Morning): Pushed Stage 5 commit `545ba89` to GitHub. Built Stage 6: Batch Job Ingestion & Leaderboard Ranking (`batch.py`) with multi-file directory scanning, descending match sorting, ASCII Leaderboard rendering, and batch cover letter generation. Added `test_batch.py` (7 tests). Total test suite grew to 53 unit tests passing in ~0.64s. Documented in `docs/batch_processing.md`. Reached ~58% on 12-stage roadmap.

@@ -1,0 +1,9 @@
+Nexus AI is seeking a Junior AI Systems Engineer in Bangalore.
+We are building production RAG pipelines, vector search infrastructure, and RESTful microservices.
+
+Requirements:
+- Strong Python programming and RESTful API design
+- Hands-on experience with Vector DBs (Chroma or FAISS) and RAG
+- Familiarity with SQLite or relational databases
+- Experience with Docker or containerization is a plus
+- Kubernetes experience preferred

@@ -1,0 +1,9 @@
+Stripe is hiring a Backend Infrastructure Engineer.
+You will work on highly scalable financial microservices, data consistency, and reliable payment execution.
+
+Requirements:
+- Strong Python or Go backend programming
+- Experience designing RESTful APIs and distributed systems
+- Deep knowledge of PostgreSQL or distributed relational databases
+- Experience with Redis caching and AWS cloud architecture
+- Familiarity with CI/CD pipelines and Docker

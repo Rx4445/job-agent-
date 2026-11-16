@@ -1,0 +1,8 @@
+Acme Studios is looking for a Creative Frontend Engineer.
+You will build stunning animations, responsive user interfaces, and component libraries.
+
+Requirements:
+- Mastery of React 19, TypeScript, and Next.js App Router
+- Advanced CSS, Tailwind CSS, and Framer Motion animation
+- Experience with GraphQL APIs and state management (Zustand or Redux)
+- Deep attention to detail for typography, layout, and Figma specs
