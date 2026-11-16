@@ -10,27 +10,27 @@ Tracking active engineering hours, feature delivery velocity, test suite growth,
 ```mermaid
 xychart-beta
     title "Active Engineering Session Hours"
-    x-axis ["Nov 11 (Late Night)", "Nov 12 (Stage 3 Sprint)", "Nov 14 (Stage 4 Sprint)"]
-    y-axis "Active Hours" 0 --> 5
-    bar [1.5, 3.1, 2.0]
+    x-axis ["Nov 11 (Session 1)", "Nov 12 (Session 2)", "Nov 14 (Session 3)", "Nov 15 (Session 4)"]
+    y-axis "Active Hours" 0 --> 6
+    bar [1.5, 3.1, 2.0, 4.5]
 ```
 
 ### 2. Automated Test Suite Reliability Growth
 ```mermaid
 xychart-beta
     title "Automated Unit Tests Passing (Fast & Free Mocks)"
-    x-axis ["V1 Baseline", "Stage 2 (Matcher)", "Stage 3 (Cover Letter)", "Stage 4 (Agent Loop & Cache)"]
-    y-axis "Tests Passing" 0 --> 45
-    line [5, 15, 24, 38]
+    x-axis ["V1 Baseline", "Stage 2 (Matcher)", "Stage 3 (Cover Letter)", "Stage 4 (Agent Loop)", "Stage 5 (Evals & CLI)"]
+    y-axis "Tests Passing" 0 --> 50
+    line [5, 15, 24, 38, 46]
 ```
 
 ### 3. Full 12-Stage Roadmap Progress
 ```mermaid
 xychart-beta
     title "Cumulative Roadmap Progress (%)"
-    x-axis ["V1 Core", "Stage 2 (Match)", "Stage 3 (Gen)", "Stage 4 (CLI Loop)"]
+    x-axis ["V1 Core", "Stage 2 (Match)", "Stage 3 (Gen)", "Stage 4 (Loop)", "Stage 5 (CLI & Evals)"]
     y-axis "Roadmap Completion (%)" 0 --> 100
-    line [15, 25, 33, 42]
+    line [15, 25, 33, 42, 50]
 ```
 
 ---
@@ -43,6 +43,25 @@ xychart-beta
 ---
 
 ## Session History Log
+
+### Session #4 — Nov 15, 2026 (Weekend Sprint)
+- **Time Window:** 09:56 – 14:15 & 21:40 – 23:00 IST
+- **Active Duration:** **4 hours 35 minutes** (275 mins)
+- **Session Capacity:** Weekend Sprint (~6–8 hours capacity, ~4.5h focused execution)
+- **Planned Target:** Commit Stage 4, Build Agent Decision Benchmark (`eval_agent.py`), Build Interactive CLI (`cli.py`), and Architectural Line-by-Line Review
+- **Accomplished:**
+  - Pushed Stage 4 commit `de97668` to GitHub with content-addressable SHA-256 resume profile caching.
+  - Implemented Stage 5 Agent Decision & Safety Benchmark (`eval_agent.py`) with 5 diverse scenarios. Achieved **100% decision gate accuracy** and **100% skill gap recall** in <0.01s without burning API tokens.
+  - Built production Interactive Job Hunter CLI (`cli.py`) supporting multiline terminal pasting (`END`), direct file input (`-f`), custom resume paths (`-r`), and headless automation (`--non-interactive`).
+  - Added unit test suite `test_cli.py` (8 tests). Cumulative test suite grew from 38 to **46 automated tests** (100% passing in ~0.71s).
+  - Completed deep line-by-line architectural walkthrough of `cli.py` controller logic, `argparse` ingestion, and `interactive` Human-in-the-Loop runtime toggling.
+  - Wrote technical architecture documentation in `docs/stage5_evals_cli.md` and updated `PROGRESS.md`.
+  - Reached **50.0% milestone (6/12 stages)** of the 12-stage Autonomous Agentic Engineer roadmap.
+- **Scope Velocity:** **100% of planned target achieved**.
+- **Test Suite:** **46 / 46 passing** (grew from 38 to 46).
+- **Roadmap Completion:** **50.0%** (6/12 stages complete).
+
+---
 
 ### Session #3 — Nov 14, 2026 (Weekday Sprint)
 - **Time Window:** 20:30 – 22:30 IST

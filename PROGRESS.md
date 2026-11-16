@@ -5,7 +5,8 @@ Version 1 (working, tested, deployed app):  ████████████
 Stage 2 (Resume & Match Engine):           ████████████  6/6    (100%) 🎉
 Stage 3 (Cover Letter & Application Gen):   ████████████  5/5    (100%) 🎉
 Stage 4 (Autonomous CLI Agent Loop):        ████████████  7/7    (100%) 🎉
-Full 12-stage roadmap:                      ██████░░░░░░  ~5.0/12  (~42%)
+Stage 5 (Agent Evals & Interactive CLI):    ████████████  4/4    (100%) 🎉
+Full 12-stage roadmap:                      ████████░░░░  ~6.0/12  (~50%) 🚀
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -45,6 +46,12 @@ Stage 4 checklist (Autonomous CLI Agent Loop):
 [x] 6 Technical architecture and state machine documentation (docs/agent_loop.md)
 [x] 7 Content-addressable SHA-256 resume caching layer in SQLite (db.py, test_db.py)
 
+Stage 5 checklist (Agent Decision Evals & Interactive CLI):
+[x] 1 Automated Agent Decision & Safety Benchmark across 5 diverse scenarios (eval_agent.py)
+[x] 2 Interactive Job Hunter CLI with multiline console input, file input, and headless mode (cli.py)
+[x] 3 Comprehensive unit test suite for CLI interaction and error handling (test_cli.py)
+[x] 4 Stage 5 evaluation and CLI documentation (docs/stage5_evals_cli.md)
+
 ## Done
 - [x] Set up git, Node, VS Code
 - [x] Install Antigravity CLI and log in
@@ -65,13 +72,15 @@ Stage 4 checklist (Autonomous CLI Agent Loop):
 - [x] Built Stage 3: Cover letter generator (`generator.py`) with anti-AI persona and strict project grounding, unit tests (`test_generator.py`), and dual-mode FastAPI endpoint `POST /cover-letter` with `resume.md` fallback. All 24 tests passing.
 - [x] Built Stage 4: Autonomous CLI Agent Loop (`agent.py`) in pure Python with state machine, Human-in-the-Loop decision gates, artifact generation, unit tests (`test_agent.py`), and docs (`docs/agent_loop.md`). All 29 tests passing.
 - [x] Built Candidate Profile SHA-256 Caching layer in `db.py` & `agent.py`: added `candidate_profile` table in SQLite, content-hashing via `compute_resume_hash`, cache-hit bypass (0ms execution, 0 tokens), and dedicated tests (`test_db.py`). All 38 tests passing in ~0.38s.
+- [x] Built Stage 5: Agent Decision Benchmark (`eval_agent.py`) with 100% gate accuracy and 100% gap recall, Interactive CLI Copilot (`cli.py`), and test suite (`test_cli.py`). All 46 tests passing in ~0.71s. Documented in `docs/stage5_evals_cli.md`.
 
 ## In progress
-- [ ] Stage 4 complete! Ready to start Stage 5 (Agent Evaluation Benchmark & Live CLI).
+- [ ] Stage 5 complete! Ready for Stage 6 (Batch Processing & Job Board Ingestion).
 
 ## Next
-- [ ] Stage 5: Evaluation Benchmark for Agent Decisions & Live Interactive Testing.
-- [ ] Multi-agent orchestration loop
+- [ ] Stage 6: Batch Job Processing, automated file ingestion & ranking.
+- [ ] Stage 7: Automated Web Scraping & Aggregation Loop (Greenhouse / Lever / LinkedIn).
+- [ ] Stage 8: Multi-Agent Specialization (Extractor Agent, Matcher Agent, Auditor Agent).
 
 
 ## Decisions made
@@ -108,3 +117,4 @@ Stage 4 checklist (Autonomous CLI Agent Loop):
 - Nov 12: Built Stage 3 (Cover Letter Generation). Designed anti-AI recruiter prompt with strict grounding in candidate resume metrics. Created generator.py with 10s timeout, 503 backoff, and 429 fail-fast. Added test_generator.py (5 tests). Implemented POST /cover-letter in main.py supporting raw posting text, saved job_id, and resume.md fallback, plus 4 unit tests in test_main.py. All 24 tests passing. Documented in docs/cover_letter.md.
 - Nov 13: Built Stage 4 (Autonomous CLI Agent Loop). Designed AgentState with execution audit logs, multi-step tool orchestration (load resume -> extract job -> SQLite -> deterministic match -> decision gate -> cover letter -> persist packet). Implemented Human-in-the-Loop decision gate (auto-approve >=70%, prompt 50-69%, warn/abort <50%). Added test_agent.py (5 tests). All 29 tests passing. Documented in docs/agent_loop.md.
 - Nov 14: Added Content-Addressable SHA-256 Resume Profile Cache in `db.py` and `agent.py`. Integrated `candidate_profile` SQLite table with instant 0ms cache-hit bypass. Created `test_db.py` (5 tests) and updated `test_agent.py` to test cache hit and miss branches (7 tests). All 38 unit tests passing. Updated docs/agent_loop.md.
+- Nov 15: Pushed Stage 4 commit `de97668` to GitHub. Built Stage 5: Agent Decision Benchmark (`eval_agent.py`) with 5 diverse scenarios (100% gate accuracy, 100% gap recall), Interactive Job Hunter CLI (`cli.py`), unit tests (`test_cli.py`), and documentation (`docs/stage5_evals_cli.md`). Total test suite grew to 46 unit tests passing in ~0.71s. Reached 50% milestone on 12-stage roadmap.
