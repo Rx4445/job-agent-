@@ -5,6 +5,7 @@ import unittest
 from db import (
     compute_resume_hash,
     get_candidate_profile,
+    get_existing_job,
     get_jobs,
     init_db,
     save_candidate_profile,
@@ -86,6 +87,16 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(jobs[0]["title"], "Software Engineer")
         self.assertEqual(jobs[0]["company"], "Acme Corp")
         self.assertEqual(jobs[0]["skills"], ["Python", "Django"])
+
+    def test_get_existing_job(self):
+        save_job("AI Systems Engineer", "Nexus AI", ["Python", "RAG"], db_path=self.db_path)
+        found = get_existing_job("ai systems engineer", "nexus ai", db_path=self.db_path)
+        self.assertIsNotNone(found)
+        self.assertEqual(found["title"], "AI Systems Engineer")
+        self.assertEqual(found["skills"], ["Python", "RAG"])
+
+        missing = get_existing_job("Frontend Dev", "Nexus AI", db_path=self.db_path)
+        self.assertIsNone(missing)
 
 
 if __name__ == "__main__":

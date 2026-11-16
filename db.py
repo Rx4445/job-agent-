@@ -61,6 +61,25 @@ def get_jobs(db_path: str = DB_FILE):
     return jobs
 
 
+def get_existing_job(title: str, company: str, db_path: str = DB_FILE) -> dict | None:
+    """Finds a previously saved job by title and company to avoid redundant LLM extraction."""
+    conn = sqlite3.connect(db_path)
+    row = conn.execute(
+        "SELECT id, title, company, skills FROM jobs WHERE LOWER(TRIM(title)) = LOWER(TRIM(?)) AND LOWER(TRIM(company)) = LOWER(TRIM(?))",
+        (title, company),
+    ).fetchone()
+    conn.close()
+    if not row:
+        return None
+    return {
+        "id": row[0],
+        "title": row[1],
+        "company": row[2],
+        "skills": json.loads(row[3]),
+    }
+
+
+
 def compute_resume_hash(resume_text: str) -> str:
     """Computes a deterministic SHA-256 fingerprint for resume text."""
     return hashlib.sha256(resume_text.strip().encode("utf-8")).hexdigest()
