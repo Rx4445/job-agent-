@@ -10,27 +10,27 @@ Tracking active engineering hours, feature delivery velocity, test suite growth,
 ```mermaid
 xychart-beta
     title "Active Engineering Session Hours"
-    x-axis ["Nov 11 (Session 1)", "Nov 12 (Session 2)", "Nov 14 (Session 3)", "Nov 15 (Session 4)", "Nov 16 (Session 5)"]
+    x-axis ["Nov 11 (S1)", "Nov 12 (S2)", "Nov 14 (S3)", "Nov 15 (S4)", "Nov 16 (S5)", "Nov 17 (S6)", "Nov 20 (S7)"]
     y-axis "Active Hours" 0 --> 6
-    bar [1.5, 3.1, 2.0, 4.5, 0.9]
+    bar [1.5, 3.1, 2.0, 4.5, 0.9, 1.8, 2.2]
 ```
 
 ### 2. Automated Test Suite Reliability Growth
 ```mermaid
 xychart-beta
     title "Automated Unit Tests Passing (Fast & Free Mocks)"
-    x-axis ["V1 Baseline", "Stage 2 (Matcher)", "Stage 3 (Cover Letter)", "Stage 4 (Agent Loop)", "Stage 5 (CLI & Evals)", "Stage 6 (Batch Engine)"]
-    y-axis "Tests Passing" 0 --> 60
-    line [5, 15, 24, 38, 46, 53]
+    x-axis ["V1", "Stage 2", "Stage 3", "Stage 4", "Stage 5", "Stage 6", "Stage 7", "Stage 8"]
+    y-axis "Tests Passing" 0 --> 80
+    line [5, 15, 24, 38, 46, 53, 64, 72]
 ```
 
 ### 3. Full 12-Stage Roadmap Progress
 ```mermaid
 xychart-beta
     title "Cumulative Roadmap Progress (%)"
-    x-axis ["V1 Core", "Stage 2 (Match)", "Stage 3 (Gen)", "Stage 4 (Loop)", "Stage 5 (CLI & Evals)", "Stage 6 (Batch Ingestion)"]
+    x-axis ["V1", "Stage 2", "Stage 3", "Stage 4", "Stage 5", "Stage 6", "Stage 7", "Stage 8"]
     y-axis "Roadmap Completion (%)" 0 --> 100
-    line [15, 25, 33, 42, 50, 58]
+    line [15, 25, 33, 42, 50, 58, 67, 75]
 ```
 
 ---
@@ -43,6 +43,46 @@ xychart-beta
 ---
 
 ## Session History Log
+
+### Session #7 — Nov 19–20, 2026 (Live Application Prep & Stage 8 Multi-Agent Reflection)
+- **Time Window:** Nov 19 12:05 – Nov 20 14:00 IST
+- **Active Duration:** **2 hours 15 minutes** (135 mins)
+- **Session Capacity:** Weekday Focused Sprint (~3 hours)
+- **Planned Target:** Run live board sweep on AI startups, generate real application packets, and build Stage 8 Multi-Agent Reflection & Auditor loop.
+- **Accomplished:**
+  - Ran live Greenhouse board sweeps against Observe.ai using `boards.py`.
+  - Generated tailored application packets in `applications/` for `AI Agent Experience Designer` (100% fit) and `AI Agent Engineer, Client Facing` (75% fit).
+  - Hardened async LLM client against peak queue load: updated HTTP timeouts to 120s in `resume.py`, `extract.py`, and `generator.py`.
+  - Parameterized `generator.py` and `auditor.py` with `gemini-3.1-flash-lite` for high-throughput, low-latency execution.
+  - Implemented Stage 8 Multi-Agent Reflection Architecture (`auditor.py`) with `AuditCritique` Pydantic schema, adversarial technical recruiter auditor prompt, async audit agent, and bounded multi-turn reflection loop (`async_generate_audited_cover_letter`).
+  - Created unit test suite `test_auditor.py` (8 tests). Cumulative test suite grew from 64 to **72 automated tests** (100% passing in ~1.21s).
+  - Wrote technical architecture documentation in `docs/multi_agent_auditor.md` and updated `PROGRESS.md`.
+  - Pushed Stage 8 commit `fcaeb82` to GitHub.
+  - Advanced roadmap to **75.0% (9/12 stages complete)**.
+- **Scope Velocity:** **100% of planned target achieved**.
+- **Test Suite:** **72 / 72 passing** (grew from 64 to 72).
+- **Roadmap Completion:** **75.0%** (9/12 stages complete).
+
+---
+
+### Session #6 — Nov 16–17, 2026 (Stage 7 Live Job Board Ingestion)
+- **Time Window:** Nov 16 14:10 – Nov 17 09:20 IST
+- **Active Duration:** **1 hour 45 minutes** (105 mins)
+- **Session Capacity:** Weekday Focused Sprint (~2 hours)
+- **Planned Target:** Stage 7 Live Greenhouse Board Ingestion & Deduplication
+- **Accomplished:**
+  - Implemented `boards.py` with public Greenhouse REST API client (`fetch_greenhouse_jobs`).
+  - Built regex/HTML entity text sanitization pipeline (`clean_html_content`).
+  - Added engineering role keyword filtering (`filter_relevant_jobs`).
+  - Implemented composite-key SQLite job deduplication (`get_existing_job`) saving 100% of LLM extraction tokens on repeated sweeps.
+  - Built unit test suite `test_boards.py` (10 tests). Cumulative test suite grew from 53 to **64 automated tests** (100% passing in ~1.08s).
+  - Documented in `docs/job_boards.md` and pushed commit `90bd5ad`.
+  - Advanced roadmap to **66.7% (8/12 stages complete)**.
+- **Scope Velocity:** **100% of planned target achieved**.
+- **Test Suite:** **64 / 64 passing** (grew from 53 to 64).
+- **Roadmap Completion:** **66.7%** (8/12 stages complete).
+
+---
 
 ### Session #5 — Nov 16, 2026 (Weekday Morning Sprint)
 - **Time Window:** 08:33 – 09:28 IST
