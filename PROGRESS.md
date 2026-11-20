@@ -8,7 +8,8 @@ Stage 4 (Autonomous CLI Agent Loop):        ████████████
 Stage 5 (Agent Evals & Interactive CLI):    ████████████  4/4    (100%) 🎉
 Stage 6 (Batch Ingestion & Leaderboard):    ████████████  6/6    (100%) 🎉
 Stage 7 (Live Job Board Ingestion):         ████████████  7/7    (100%) 🎉
-Full 12-stage roadmap:                      ██████████░░  ~8.0/12  (~67%) 🚀
+Stage 8 (Multi-Agent Reflection & Auditor):  ████████████  6/6    (100%) 🎉
+Full 12-stage roadmap:                      █████████░░░  ~9.0/12  (~75%) 🚀
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -71,6 +72,14 @@ Stage 7 checklist (Live Job Board Ingestion):
 [x] 6 Unit test suite covering HTML cleaning, mock APIs, and deduplication (test_boards.py)
 [x] 7 Technical architecture documentation (docs/job_boards.md)
 
+Stage 8 checklist (Multi-Agent Reflection & Auditor Loop):
+[x] 1 Structured critique schema with grounding & hallucination flags (AuditCritique in auditor.py)
+[x] 2 Adversarial recruiter auditor persona & prompt design (build_auditor_prompt)
+[x] 3 Async auditor agent with retry backoff and 120s timeout (async_audit_cover_letter)
+[x] 4 Bounded multi-agent reflection loop with critique-driven revision (async_generate_audited_cover_letter)
+[x] 5 Unit test suite covering audit parsing, hallucination catches, 503 retries, and multi-turn refinement (test_auditor.py - 8 tests)
+[x] 6 Technical architecture documentation (docs/multi_agent_auditor.md)
+
 ## Done
 - [x] Set up git, Node, VS Code
 - [x] Install Antigravity CLI and log in
@@ -94,13 +103,14 @@ Stage 7 checklist (Live Job Board Ingestion):
 - [x] Built Stage 5: Agent Decision Benchmark (`eval_agent.py`) with 100% gate accuracy and 100% gap recall, Interactive CLI Copilot (`cli.py`), and test suite (`test_cli.py`). All 46 tests passing in ~0.71s. Documented in `docs/stage5_evals_cli.md`.
 - [x] Built Stage 6: Batch Job Ingestion & Leaderboard Ranking (`batch.py`) with directory scanning, descending leaderboard table, interactive and headless application generation, and unit tests (`test_batch.py`). All 53 unit tests passing in ~0.64s. Documented in `docs/batch_processing.md`.
 - [x] Built Stage 7: Automated Job Board Ingestion (`boards.py`) with public Greenhouse REST API client, regex/html entity text sanitization, role keyword relevance filtering, SQLite job deduplication (`get_existing_job`), and full batch ranking integration. Added `test_boards.py` (10 tests). All 64 unit tests passing in ~1.08s. Documented in `docs/job_boards.md`.
+- [x] Built Stage 8: Multi-Agent Reflection Architecture (`auditor.py`) with structured `AuditCritique` Pydantic schema, adversarial technical recruiter auditor persona, and iterative reflection feedback loop (`async_generate_audited_cover_letter`). Added `test_auditor.py` (8 tests). All 72 unit tests passing in ~1.21s. Documented in `docs/multi_agent_auditor.md`. Reached 75% on 12-stage roadmap.
 
 ## In progress
-- [ ] Stage 7 complete! Ready for Stage 8 (Multi-Agent Specialization).
+- [ ] Stage 8 complete! Ready for Stage 9 (Automated Interview Prep & Question Generation).
 
 ## Next
-- [ ] Stage 8: Multi-Agent Specialization (Extractor Agent, Matcher Agent, Auditor Agent).
-- [ ] Stage 9: Automated Interview Prep & Question Generation.
+- [ ] Stage 9: Automated Interview Prep & Question Generation (Interview Simulator Agent).
+- [ ] Stage 10: Multi-Platform ATS Expansion (Lever & Workday API connectors).
 
 
 ## Decisions made
@@ -140,3 +150,4 @@ Stage 7 checklist (Live Job Board Ingestion):
 - Nov 15: Pushed Stage 4 commit `de97668` to GitHub. Built Stage 5: Agent Decision Benchmark (`eval_agent.py`) with 5 diverse scenarios (100% gate accuracy, 100% gap recall), Interactive Job Hunter CLI (`cli.py`), unit tests (`test_cli.py`), and documentation (`docs/stage5_evals_cli.md`). Total test suite grew to 46 unit tests passing in ~0.71s. Reached 50% milestone on 12-stage roadmap.
 - Nov 16 (Morning): Pushed Stage 5 commit `545ba89` to GitHub. Built Stage 6: Batch Job Ingestion & Leaderboard Ranking (`batch.py`) with multi-file directory scanning, descending match sorting, ASCII Leaderboard rendering, and batch cover letter generation. Added `test_batch.py` (7 tests). Total test suite grew to 53 unit tests passing in ~0.64s. Documented in `docs/batch_processing.md`. Reached ~58% on 12-stage roadmap.
 - Nov 16 (Afternoon): Built Stage 7: Automated Job Board Ingestion (`boards.py`) connecting directly to live public Greenhouse REST API. Built HTML text sanitizer (`clean_html_content`), engineering keyword filter, SQLite job deduplication (`get_existing_job`), and full leaderboard dispatch. Added `test_boards.py` (10 tests). Total test suite grew to 64 unit tests passing in ~1.08s. Documented in `docs/job_boards.md`. Reached ~67% on 12-stage roadmap.
+- Nov 20: Built Stage 8: Multi-Agent Reflection & Auditor Loop (`auditor.py`). Implemented `AuditCritique` Pydantic schema, adversarial hiring manager auditor prompt, async audit agent, and bounded multi-turn reflection loop (`async_generate_audited_cover_letter`). Added unit test suite `test_auditor.py` (8 tests). All 72 unit tests passing in ~1.21s. Documented in `docs/multi_agent_auditor.md`. Advanced roadmap to 75.0% (9/12 stages complete).

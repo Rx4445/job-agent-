@@ -49,6 +49,7 @@ async def async_generate_cover_letter(
     job: JobPosting,
     match: MatchResult,
     resume_text: str,
+    model: str = "gemini-3.1-flash-lite",
     max_retries: int = 3,
 ) -> str:
     prompt = build_cover_letter_prompt(job, match, resume_text)
@@ -57,9 +58,9 @@ async def async_generate_cover_letter(
         try:
             response = await client.aio.models.generate_content(
                 config=types.GenerateContentConfig(
-                    http_options=types.HttpOptions(timeout=30000),
+                    http_options=types.HttpOptions(timeout=120000),
                 ),
-                model="gemini-3.6-flash",
+                model=model,
                 contents=prompt,
             )
             return response.text

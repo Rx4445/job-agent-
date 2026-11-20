@@ -28,7 +28,7 @@ async def async_extract_job(posting: str, max_retries: int = 3) -> JobPosting:
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=JobPosting,
-                    http_options=types.HttpOptions(timeout=30000),
+                    http_options=types.HttpOptions(timeout=120000),
                 ),
                 model="gemini-3.6-flash",
                 contents=f"List the job title, company, and required skills from this posting:\n{posting}",
