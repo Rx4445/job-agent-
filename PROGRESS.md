@@ -9,7 +9,8 @@ Stage 5 (Agent Evals & Interactive CLI):    ████████████
 Stage 6 (Batch Ingestion & Leaderboard):    ████████████  6/6    (100%) 🎉
 Stage 7 (Live Job Board Ingestion):         ████████████  7/7    (100%) 🎉
 Stage 8 (Multi-Agent Reflection & Auditor):  ████████████  6/6    (100%) 🎉
-Full 12-stage roadmap:                      █████████░░░  ~9.0/12  (~75%) 🚀
+Stage 9 (Interview Simulator Agent):          ████████████  6/6    (100%) 🎉
+Full 12-stage roadmap:                      ██████████░░  ~10.0/12 (~83.3%) 🚀
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -80,6 +81,14 @@ Stage 8 checklist (Multi-Agent Reflection & Auditor Loop):
 [x] 5 Unit test suite covering audit parsing, hallucination catches, 503 retries, and multi-turn refinement (test_auditor.py - 8 tests)
 [x] 6 Technical architecture documentation (docs/multi_agent_auditor.md)
 
+Stage 9 checklist (Automated Interview Prep & Question Simulator):
+[x] 1 Structured InterviewBattlecard & STARResponse schemas (interview.py)
+[x] 2 Adversarial Bar Raiser persona & 5-question prompt engineering (build_interview_prompt)
+[x] 3 Async battlecard generation with client-side Pydantic validation (async_generate_interview_battlecard)
+[x] 4 Markdown battlecard disk persistence in applications/ (save_interview_battlecard)
+[x] 5 Unit test suite covering prompt synthesis, 503 retries, 429 fail-fast, and file persistence (test_interview.py - 5 tests)
+[x] 6 Technical architecture documentation (docs/interview_simulator.md)
+
 ## Done
 - [x] Set up git, Node, VS Code
 - [x] Install Antigravity CLI and log in
@@ -104,13 +113,14 @@ Stage 8 checklist (Multi-Agent Reflection & Auditor Loop):
 - [x] Built Stage 6: Batch Job Ingestion & Leaderboard Ranking (`batch.py`) with directory scanning, descending leaderboard table, interactive and headless application generation, and unit tests (`test_batch.py`). All 53 unit tests passing in ~0.64s. Documented in `docs/batch_processing.md`.
 - [x] Built Stage 7: Automated Job Board Ingestion (`boards.py`) with public Greenhouse REST API client, regex/html entity text sanitization, role keyword relevance filtering, SQLite job deduplication (`get_existing_job`), and full batch ranking integration. Added `test_boards.py` (10 tests). All 64 unit tests passing in ~1.08s. Documented in `docs/job_boards.md`.
 - [x] Built Stage 8: Multi-Agent Reflection Architecture (`auditor.py`) with structured `AuditCritique` Pydantic schema, adversarial technical recruiter auditor persona, and iterative reflection feedback loop (`async_generate_audited_cover_letter`). Added `test_auditor.py` (8 tests). All 72 unit tests passing in ~1.21s. Documented in `docs/multi_agent_auditor.md`. Reached 75% on 12-stage roadmap.
+- [x] Built Stage 9: Automated Interview Prep & Question Simulator (`interview.py`) with structured `InterviewBattlecard` schema, adversarial Bar Raiser persona, client-side Pydantic validation, and STAR response generator. Added `test_interview.py` (5 tests). All 77 unit tests passing in ~1.07s. Documented in `docs/interview_simulator.md`. Advanced roadmap to 83.3% (10/12 stages complete).
 
 ## In progress
-- [ ] Stage 8 complete! Ready for Stage 9 (Automated Interview Prep & Question Generation).
+- [ ] Wire up multi-agent reflection into `agent.py` and `batch.py` (replace legacy `async_generate_cover_letter` with `async_generate_audited_cover_letter`).
 
 ## Next
-- [ ] Stage 9: Automated Interview Prep & Question Generation (Interview Simulator Agent).
 - [ ] Stage 10: Multi-Platform ATS Expansion (Lever & Workday API connectors).
+- [ ] Stage 11: Real-time Email & Cold Outreach Notification Agent.
 
 
 ## Decisions made
