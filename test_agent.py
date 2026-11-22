@@ -8,6 +8,7 @@ from extract import JobPosting
 from resume import Resume
 from agent import AgentState, evaluate_decision_gate, run_job_agent, save_application_packet
 from matcher import MatchResult
+from auditor import AuditCritique
 
 
 class TestJobAgent(unittest.IsolatedAsyncioTestCase):
@@ -25,13 +26,20 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
             skills=["Python", "RAG", "Vector DBs"],
         )
         self.raw_resume_text = "Aarya Pradhan. Built RAG with Python and Chroma across 10k docs."
+        self.sample_critique = AuditCritique(
+            score=9,
+            is_grounded=True,
+            hallucinated_claims=[],
+            tone_rating="authentic",
+            critique_notes="Well grounded on resume facts.",
+        )
 
     def tearDown(self):
         shutil.rmtree(self.test_dir, ignore_errors=True)
 
     @patch("agent.save_candidate_profile")
     @patch("agent.get_candidate_profile", return_value=None)
-    @patch("agent.async_generate_cover_letter", new_callable=AsyncMock)
+    @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
     @patch("agent.async_extract_resume", new_callable=AsyncMock)
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
@@ -40,7 +48,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
     ):
         mock_extract_job.return_value = self.sample_job
         mock_extract_resume.return_value = self.sample_resume
-        mock_generate_letter.return_value = "Dear Nexus AI Team, I built a RAG system..."
+        mock_generate_letter.return_value = ("Dear Nexus AI Team, I built a RAG system...", [self.sample_critique])
 
         state = await run_job_agent(
             posting_text="Job posting text...",
@@ -53,13 +61,15 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(state.cover_letter)
         self.assertIsNotNone(state.output_path)
         self.assertTrue(os.path.exists(state.output_path))
+        self.assertEqual(len(state.audit_history), 1)
+        self.assertEqual(state.audit_history[0].score, 9)
         mock_generate_letter.assert_called_once()
         mock_save.assert_called_once()
 
     @patch("builtins.input", return_value="n")
     @patch("agent.save_candidate_profile")
     @patch("agent.get_candidate_profile", return_value=None)
-    @patch("agent.async_generate_cover_letter", new_callable=AsyncMock)
+    @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
     @patch("agent.async_extract_resume", new_callable=AsyncMock)
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
@@ -90,7 +100,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
     @patch("builtins.input", return_value="y")
     @patch("agent.save_candidate_profile")
     @patch("agent.get_candidate_profile", return_value=None)
-    @patch("agent.async_generate_cover_letter", new_callable=AsyncMock)
+    @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
     @patch("agent.async_extract_resume", new_callable=AsyncMock)
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
@@ -105,7 +115,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
             field="AI Engineering",
             skills=["Python", "RAG"],
         )
-        mock_generate_letter.return_value = "Cover letter text..."
+        mock_generate_letter.return_value = ("Cover letter text...", [self.sample_critique])
 
         state = await run_job_agent(
             posting_text="Job posting text...",
@@ -121,7 +131,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
     @patch("builtins.input", return_value="n")
     @patch("agent.save_candidate_profile")
     @patch("agent.get_candidate_profile", return_value=None)
-    @patch("agent.async_generate_cover_letter", new_callable=AsyncMock)
+    @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
     @patch("agent.async_extract_resume", new_callable=AsyncMock)
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
@@ -159,7 +169,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(any("Failed to load resume" in log for log in state.logs))
 
     @patch("agent.get_candidate_profile")
-    @patch("agent.async_generate_cover_letter", new_callable=AsyncMock)
+    @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
     @patch("agent.async_extract_resume", new_callable=AsyncMock)
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
@@ -173,7 +183,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
             "field": "AI Engineering",
             "skills": ["Python", "RAG", "Vector DBs"],
         }
-        mock_generate_letter.return_value = "Cover letter text..."
+        mock_generate_letter.return_value = ("Cover letter text...", [self.sample_critique])
 
         state = await run_job_agent(
             posting_text="Job posting text...",
@@ -190,7 +200,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
 
     @patch("agent.save_candidate_profile")
     @patch("agent.get_candidate_profile", return_value=None)
-    @patch("agent.async_generate_cover_letter", new_callable=AsyncMock)
+    @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
     @patch("agent.async_extract_resume", new_callable=AsyncMock)
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
@@ -199,7 +209,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
     ):
         mock_extract_job.return_value = self.sample_job
         mock_extract_resume.return_value = self.sample_resume
-        mock_generate_letter.return_value = "Cover letter text..."
+        mock_generate_letter.return_value = ("Cover letter text...", [self.sample_critique])
 
         state = await run_job_agent(
             posting_text="Job posting text...",

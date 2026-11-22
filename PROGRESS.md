@@ -114,9 +114,10 @@ Stage 9 checklist (Automated Interview Prep & Question Simulator):
 - [x] Built Stage 7: Automated Job Board Ingestion (`boards.py`) with public Greenhouse REST API client, regex/html entity text sanitization, role keyword relevance filtering, SQLite job deduplication (`get_existing_job`), and full batch ranking integration. Added `test_boards.py` (10 tests). All 64 unit tests passing in ~1.08s. Documented in `docs/job_boards.md`.
 - [x] Built Stage 8: Multi-Agent Reflection Architecture (`auditor.py`) with structured `AuditCritique` Pydantic schema, adversarial technical recruiter auditor persona, and iterative reflection feedback loop (`async_generate_audited_cover_letter`). Added `test_auditor.py` (8 tests). All 72 unit tests passing in ~1.21s. Documented in `docs/multi_agent_auditor.md`. Reached 75% on 12-stage roadmap.
 - [x] Built Stage 9: Automated Interview Prep & Question Simulator (`interview.py`) with structured `InterviewBattlecard` schema, adversarial Bar Raiser persona, client-side Pydantic validation, and STAR response generator. Added `test_interview.py` (5 tests). All 77 unit tests passing in ~1.07s. Documented in `docs/interview_simulator.md`. Advanced roadmap to 83.3% (10/12 stages complete).
+- [x] Wired Multi-Agent Reflection Loop (`auditor.py`) directly into `agent.py` and `batch.py`. Single and batch applications now automatically undergo adversarial critique and iterative refinement, appending the Auditor Report Card into generated application packets. Updated `test_agent.py` and `test_batch.py`. All 77 unit tests passing in ~1.15s.
 
 ## In progress
-- [ ] Wire up multi-agent reflection into `agent.py` and `batch.py` (replace legacy `async_generate_cover_letter` with `async_generate_audited_cover_letter`).
+- [ ] Stage 10: Multi-Platform ATS Expansion (Lever & Workday API connectors).
 
 ## Next
 - [ ] Stage 10: Multi-Platform ATS Expansion (Lever & Workday API connectors).

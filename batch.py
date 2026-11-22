@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from extract import JobPosting, async_extract_job                                                 
 from resume import Resume, async_extract_resume                                                   
 from matcher import MatchResult, match_job_and_resume                                             
-from generator import async_generate_cover_letter                                                 
+from auditor import async_generate_audited_cover_letter                                                 
 from db import init_db, save_job, compute_resume_hash, get_candidate_profile,save_candidate_profile                                                                            
 from agent import load_resume_text, save_application_packet, AgentState                           
                                                                                                     
@@ -139,8 +139,8 @@ async def generate_batch_applications(
     print(f"\n[GENERATING] Building application packets for {len(selected_results)} selected job(s)...")
 
     for res in selected_results:
-        print(f"  -> Drafting tailored letter for '{res.job.title}' at '{res.job.company}'...")
-        res.cover_letter = await async_generate_cover_letter(res.job, res.match, resume_text)
+        print(f"  -> Drafting and auditing letter for '{res.job.title}' at '{res.job.company}'...")
+        res.cover_letter, audit_history = await async_generate_audited_cover_letter(res.job, res.match, resume_text)
 
         state = AgentState(
             posting_text="",
@@ -150,6 +150,7 @@ async def generate_batch_applications(
             match=res.match,
             decision=res.decision,
             cover_letter=res.cover_letter,
+            audit_history=audit_history,
         )
         filepath = save_application_packet(state, output_dir=output_dir)
         res.output_path = filepath

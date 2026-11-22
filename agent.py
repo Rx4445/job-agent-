@@ -7,7 +7,7 @@ from datetime import datetime
 from extract import JobPosting, async_extract_job
 from resume import Resume, async_extract_resume
 from matcher import MatchResult, match_job_and_resume
-from generator import async_generate_cover_letter
+from auditor import AuditCritique, async_generate_audited_cover_letter
 from db import (
     compute_resume_hash,
     get_candidate_profile,
@@ -26,6 +26,7 @@ class AgentState:
     match: MatchResult | None = None
     decision: str = "PENDING"  # PENDING, APPROVED, ABORTED
     cover_letter: str | None = None
+    audit_history: list[AuditCritique] = field(default_factory=list)
     output_path: str | None = None
     logs: list[str] = field(default_factory=list)
 
@@ -60,6 +61,21 @@ def save_application_packet(state: AgentState, output_dir: str = "applications")
     missing = ", ".join(state.match.missing_skills) if state.match and state.match.missing_skills else "None"
     score = state.match.match_score if state.match else 0.0
 
+    audit_section = ""
+    if state.audit_history:
+        latest = state.audit_history[-1]
+        audit_section = f"""---
+
+## 🛡️ Multi-Agent Auditor Evaluation
+- **Final Auditor Score:** {latest.score}/10
+- **Factually Grounded:** {"✅ Yes" if latest.is_grounded else "❌ No"}
+- **Tone Rating:** {latest.tone_rating}
+- **Total Audit Turns / Revisions:** {len(state.audit_history)}
+- **Auditor Feedback:** {latest.critique_notes}
+"""
+        if latest.hallucinated_claims:
+            audit_section += f"- **Flagged Claims Purged:** {', '.join(latest.hallucinated_claims)}\n"
+
     content = f"""# Application Packet: {state.job.title if state.job else 'Role'} at {state.job.company if state.job else 'Company'}
 **Generated:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}  
 **Candidate:** {state.candidate.name if state.candidate else 'Candidate'}  
@@ -71,7 +87,7 @@ def save_application_packet(state: AgentState, output_dir: str = "applications")
 - **Matching Skills ({len(state.match.matching_skills) if state.match else 0}):** {matching}
 - **Missing Skills ({len(state.match.missing_skills) if state.match else 0}):** {missing}
 
----
+{audit_section}---
 
 ## Tailored Cover Letter
 {state.cover_letter or "No cover letter generated."}
@@ -186,11 +202,14 @@ async def run_job_agent(
     state.decision = "APPROVED"
     state.log("Decision gate approved. Proceeding to cover letter generation.")
 
-    # Step 6: Generate Grounded Cover Letter
+    # Step 6: Generate Grounded Cover Letter via Multi-Agent Reflection
     try:
-        state.log("Step 4/4: Generating tailored cover letter grounded on resume metrics...")
-        state.cover_letter = await async_generate_cover_letter(state.job, state.match, state.resume_text)
-        state.log("Cover letter successfully generated.")
+        state.log("Step 4/4: Generating tailored cover letter via Multi-Agent Reflection Loop...")
+        state.cover_letter, state.audit_history = await async_generate_audited_cover_letter(
+            state.job, state.match, state.resume_text
+        )
+        final_score = state.audit_history[-1].score if state.audit_history else 0
+        state.log(f"Cover letter approved by Auditor (Score: {final_score}/10, Turns: {len(state.audit_history)}).")
     except Exception as e:
         state.decision = "FAILED_GENERATION"
         state.log(f"Cover letter generation failed: {e}")

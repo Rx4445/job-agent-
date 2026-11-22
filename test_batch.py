@@ -100,8 +100,9 @@ class TestBatchProcessing(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(results[1].match.match_score, 0.0)
 
     @patch("batch.save_application_packet", return_value="applications/sample.md")
-    @patch("batch.async_generate_cover_letter", new_callable=AsyncMock, return_value="Cover letter body...")
+    @patch("batch.async_generate_audited_cover_letter", new_callable=AsyncMock)
     async def test_generate_batch_applications(self, mock_generate_letter, mock_save_packet):
+        mock_generate_letter.return_value = ("Cover letter body...", [])
         job = JobPosting(title="AI Eng", company="Nexus", skills=["Python"])
         match = MatchResult(
             field_match=True, match_score=100.0, matching_skills=["Python"], missing_skills=[], is_recommended=True
