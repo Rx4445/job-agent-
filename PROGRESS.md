@@ -10,7 +10,8 @@ Stage 6 (Batch Ingestion & Leaderboard):    ████████████
 Stage 7 (Live Job Board Ingestion):         ████████████  7/7    (100%) 🎉
 Stage 8 (Multi-Agent Reflection & Auditor):  ████████████  6/6    (100%) 🎉
 Stage 9 (Interview Simulator Agent):          ████████████  6/6    (100%) 🎉
-Full 12-stage roadmap:                      ██████████░░  ~10.0/12 (~83.3%) 🚀
+Stage 10 (Multi-Platform ATS Connectors):     ████████████  6/6    (100%) 🎉
+Full 12-stage roadmap:                      ███████████░  ~11.0/12 (~91.7%) 🚀
 
 V1 checklist:
 [x] 1  Tools set up (git, Node, VS Code, agy)
@@ -89,6 +90,14 @@ Stage 9 checklist (Automated Interview Prep & Question Simulator):
 [x] 5 Unit test suite covering prompt synthesis, 503 retries, 429 fail-fast, and file persistence (test_interview.py - 5 tests)
 [x] 6 Technical architecture documentation (docs/interview_simulator.md)
 
+Stage 10 checklist (Multi-Platform ATS Connectors - Lever & Unified Ingestion):
+[x] 1 Public Lever REST API client with schema normalization (fetch_lever_jobs in boards.py)
+[x] 2 Content aggregator parsing description, structured lists, and requirements (boards.py)
+[x] 3 Unified ATS auto-detection and fallback router (fetch_live_jobs in boards.py)
+[x] 4 Multi-platform CLI arguments supporting --platform auto/greenhouse/lever (boards.py)
+[x] 5 Unit test suite covering Lever parsing, 404 handling, network errors, and auto-routing (test_boards.py - 16 tests)
+[x] 6 Technical architecture documentation (docs/stage10_ats_connectors.md)
+
 ## Done
 - [x] Set up git, Node, VS Code
 - [x] Install Antigravity CLI and log in
@@ -115,13 +124,14 @@ Stage 9 checklist (Automated Interview Prep & Question Simulator):
 - [x] Built Stage 8: Multi-Agent Reflection Architecture (`auditor.py`) with structured `AuditCritique` Pydantic schema, adversarial technical recruiter auditor persona, and iterative reflection feedback loop (`async_generate_audited_cover_letter`). Added `test_auditor.py` (8 tests). All 72 unit tests passing in ~1.21s. Documented in `docs/multi_agent_auditor.md`. Reached 75% on 12-stage roadmap.
 - [x] Built Stage 9: Automated Interview Prep & Question Simulator (`interview.py`) with structured `InterviewBattlecard` schema, adversarial Bar Raiser persona, client-side Pydantic validation, and STAR response generator. Added `test_interview.py` (5 tests). All 77 unit tests passing in ~1.07s. Documented in `docs/interview_simulator.md`. Advanced roadmap to 83.3% (10/12 stages complete).
 - [x] Wired Multi-Agent Reflection Loop (`auditor.py`) directly into `agent.py` and `batch.py`. Single and batch applications now automatically undergo adversarial critique and iterative refinement, appending the Auditor Report Card into generated application packets. Updated `test_agent.py` and `test_batch.py`. All 77 unit tests passing in ~1.15s.
+- [x] Built Stage 10: Multi-Platform ATS Expansion (`boards.py`) with public Lever REST API connector, content aggregation, unified ATS auto-detection router (Greenhouse -> Lever fallback), and CLI platform arguments. Added 6 new unit tests in `test_boards.py`. Cumulative test suite grew to 83 automated tests (100% passing in ~1.02s). Documented in `docs/stage10_ats_connectors.md`. Reached ~91.7% on 12-stage roadmap.
 
 ## In progress
-- [ ] Stage 10: Multi-Platform ATS Expansion (Lever & Workday API connectors).
+- [ ] Stage 11: Real-time Email & Cold Outreach Notification Agent.
 
 ## Next
-- [ ] Stage 10: Multi-Platform ATS Expansion (Lever & Workday API connectors).
 - [ ] Stage 11: Real-time Email & Cold Outreach Notification Agent.
+- [ ] Stage 12: Production End-to-End Evaluation Benchmark & Packaging.
 
 
 ## Decisions made

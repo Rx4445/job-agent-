@@ -91,6 +91,108 @@ async def fetch_greenhouse_jobs(
         return parsed_jobs
 
 
+async def fetch_lever_jobs(
+    company_slug: str,
+    timeout: float = 15.0,
+) -> list[dict]:
+    """Fetches all live open jobs for a company from Lever's public API."""
+    url = f"https://api.lever.co/v0/postings/{company_slug}?mode=json"
+
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        try:
+            response = await client.get(url)
+        except httpx.RequestError as e:
+            raise ConnectionError(f"Failed to connect to Lever for '{company_slug}': {e}")
+
+        if response.status_code == 404:
+            raise ValueError(f"Company board '{company_slug}' not found on Lever.")
+
+        if response.status_code != 200:
+            raise RuntimeError(
+                f"Lever API returned HTTP {response.status_code} for '{company_slug}'."
+            )
+
+        raw_jobs = response.json()
+        if not isinstance(raw_jobs, list):
+            error_msg = raw_jobs.get("error", f"Unexpected response from Lever for '{company_slug}'")
+            raise ValueError(f"Lever error for '{company_slug}': {error_msg}")
+
+        parsed_jobs = []
+        for j in raw_jobs:
+            job_id = str(j.get("id", ""))
+            title = j.get("text", "").strip()
+            categories = j.get("categories", {}) or {}
+            location = categories.get("location", "Remote / Not Specified").strip()
+
+            parts = []
+            if j.get("descriptionPlain"):
+                parts.append(j["descriptionPlain"].strip())
+
+            for item in j.get("lists", []) or []:
+                header = item.get("text", "").strip()
+                content = clean_html_content(item.get("content", ""))
+                if header and content:
+                    parts.append(f"{header}:\n{content}")
+                elif content:
+                    parts.append(content)
+
+            if j.get("additionalPlain"):
+                parts.append(j["additionalPlain"].strip())
+
+            full_text = "\n\n".join(parts) if parts else clean_html_content(j.get("description", ""))
+
+            parsed_jobs.append(
+                {
+                    "id": job_id,
+                    "title": title,
+                    "company": company_slug.capitalize(),
+                    "location": location,
+                    "raw_content": full_text,
+                    "url": j.get("hostedUrl", ""),
+                }
+            )
+
+        return parsed_jobs
+
+
+async def fetch_live_jobs(
+    company_slug: str,
+    platform: str = "auto",
+    timeout: float = 15.0,
+) -> tuple[list[dict], str]:
+    """Unified ATS router: fetches jobs from Greenhouse, Lever, or auto-detects."""
+    platform_clean = platform.lower().strip()
+
+    if platform_clean == "greenhouse":
+        jobs = await fetch_greenhouse_jobs(company_slug, timeout=timeout)
+        return jobs, "greenhouse"
+
+    if platform_clean == "lever":
+        jobs = await fetch_lever_jobs(company_slug, timeout=timeout)
+        return jobs, "lever"
+
+    if platform_clean == "auto":
+        # 1. Probe Greenhouse first
+        try:
+            jobs = await fetch_greenhouse_jobs(company_slug, timeout=timeout)
+            return jobs, "greenhouse"
+        except (ValueError, RuntimeError):
+            pass
+
+        # 2. Fallback to Lever
+        try:
+            jobs = await fetch_lever_jobs(company_slug, timeout=timeout)
+            return jobs, "lever"
+        except (ValueError, RuntimeError):
+            pass
+
+        raise ValueError(
+            f"Company board '{company_slug}' not found on either Greenhouse or Lever."
+        )
+
+    raise ValueError(f"Unsupported ATS platform '{platform}'. Supported: 'greenhouse', 'lever', 'auto'.")
+
+
 def filter_relevant_jobs(
     jobs: list[dict],
     keywords: list[str] = ["ai", "engineer", "machine learning", "backend", "software", "python"],
@@ -112,21 +214,22 @@ def filter_relevant_jobs(
 
 async def ingest_live_board_and_rank(
     company_slug: str,
+    platform: str = "auto",
     limit: int = 5,
     resume_path: str = "resume.md",
     auto_generate_approved: bool = False,
     output_dir: str = "applications",
 ) -> list[BatchJobResult]:
-    """Fetches real jobs from Greenhouse, filters relevant engineering roles, scores and ranks them."""
+    """Fetches real jobs from Greenhouse/Lever, filters relevant engineering roles, scores and ranks them."""
     init_db()
     print("=" * 80)
-    print(f"      LIVE BOARD INGESTION: '{company_slug.upper()}' (GREENHOUSE API)      ")
+    print(f"      LIVE BOARD INGESTION: '{company_slug.upper()}' (PLATFORM: {platform.upper()})      ")
     print("=" * 80)
 
-    # 1. Fetch & Filter Live Postings
-    print(f"\n[1/4] Querying Greenhouse API for '{company_slug}' open positions...")
-    all_jobs = await fetch_greenhouse_jobs(company_slug)
-    print(f"      Found {len(all_jobs)} total open positions.")
+    # 1. Fetch & Filter Live Postings via Unified Router
+    print(f"\n[1/4] Querying {platform.capitalize()} ATS for '{company_slug}' open positions...")
+    all_jobs, detected_platform = await fetch_live_jobs(company_slug, platform=platform)
+    print(f"      Connected via: {detected_platform.upper()} (Found {len(all_jobs)} total open positions).")
 
     relevant_jobs = filter_relevant_jobs(all_jobs)
     print(f"      Filtered to {len(relevant_jobs)} relevant engineering/technical roles.")
@@ -236,8 +339,9 @@ async def ingest_live_board_and_rank(
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Live Job Board Ingestion Agent (Greenhouse)")
-    parser.add_argument("--company", "-c", required=True, help="Company slug on Greenhouse (e.g. cloudflare, anthropic, figma)")
+    parser = argparse.ArgumentParser(description="Multi-Platform Live Job Board Ingestion Agent (Greenhouse & Lever)")
+    parser.add_argument("--company", "-c", required=True, help="Company slug (e.g. cloudflare, observeai, palantir)")
+    parser.add_argument("--platform", "-p", default="auto", choices=["auto", "greenhouse", "lever"], help="ATS platform (default: auto)")
     parser.add_argument("--limit", "-l", type=int, default=3, help="Max number of jobs to evaluate (default: 3)")
     parser.add_argument("--auto-generate", action="store_true", help="Auto-generate packets for approved jobs")
     args = parser.parse_args()
@@ -245,6 +349,7 @@ if __name__ == "__main__":
     asyncio.run(
         ingest_live_board_and_rank(
             company_slug=args.company,
+            platform=args.platform,
             limit=args.limit,
             auto_generate_approved=args.auto_generate,
         )
