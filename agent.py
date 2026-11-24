@@ -8,6 +8,7 @@ from extract import JobPosting, async_extract_job
 from resume import Resume, async_extract_resume
 from matcher import MatchResult, match_job_and_resume
 from auditor import AuditCritique, async_generate_audited_cover_letter
+from outreach import OutreachDraft, async_generate_outreach, save_outreach_packet
 from db import (
     compute_resume_hash,
     get_candidate_profile,
@@ -27,6 +28,8 @@ class AgentState:
     decision: str = "PENDING"  # PENDING, APPROVED, ABORTED
     cover_letter: str | None = None
     audit_history: list[AuditCritique] = field(default_factory=list)
+    outreach_draft: OutreachDraft | None = None
+    outreach_path: str | None = None
     output_path: str | None = None
     logs: list[str] = field(default_factory=list)
 
@@ -76,6 +79,19 @@ def save_application_packet(state: AgentState, output_dir: str = "applications")
         if latest.hallucinated_claims:
             audit_section += f"- **Flagged Claims Purged:** {', '.join(latest.hallucinated_claims)}\n"
 
+    outreach_section = ""
+    if state.outreach_path and state.outreach_draft:
+        outreach_filename = os.path.basename(state.outreach_path)
+        subject_preview = state.outreach_draft.subject_lines[0] if state.outreach_draft.subject_lines else "Cold Outreach"
+        outreach_section = f"""---
+
+## 📬 Recruiter Cold Outreach Packet
+- **Packet File:** `{outreach_filename}`
+- **Recommended Subject Line:** `{subject_preview}`
+- **Conversational Hook:** {state.outreach_draft.hook}
+- **Short LinkedIn DM:** {state.outreach_draft.linkedin_dm}
+"""
+
     content = f"""# Application Packet: {state.job.title if state.job else 'Role'} at {state.job.company if state.job else 'Company'}
 **Generated:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}  
 **Candidate:** {state.candidate.name if state.candidate else 'Candidate'}  
@@ -87,7 +103,7 @@ def save_application_packet(state: AgentState, output_dir: str = "applications")
 - **Matching Skills ({len(state.match.matching_skills) if state.match else 0}):** {matching}
 - **Missing Skills ({len(state.match.missing_skills) if state.match else 0}):** {missing}
 
-{audit_section}---
+{audit_section}{outreach_section}---
 
 ## Tailored Cover Letter
 {state.cover_letter or "No cover letter generated."}
@@ -204,7 +220,7 @@ async def run_job_agent(
 
     # Step 6: Generate Grounded Cover Letter via Multi-Agent Reflection
     try:
-        state.log("Step 4/4: Generating tailored cover letter via Multi-Agent Reflection Loop...")
+        state.log("Step 4/5: Generating tailored cover letter via Multi-Agent Reflection Loop...")
         state.cover_letter, state.audit_history = await async_generate_audited_cover_letter(
             state.job, state.match, state.resume_text
         )
@@ -215,7 +231,19 @@ async def run_job_agent(
         state.log(f"Cover letter generation failed: {e}")
         return state
 
-    # Step 7: Persist Application Packet to Disk
+    # Step 7: Generate Recruiter Cold Outreach Packet (Stage 11)
+    try:
+        state.log("Step 5/5: Generating recruiter cold outreach packet...")
+        state.outreach_draft = await async_generate_outreach(
+            state.job, state.match, state.resume_text
+        )
+        outreach_filepath = save_outreach_packet(state.outreach_draft, output_dir=output_dir)
+        state.outreach_path = outreach_filepath
+        state.log(f"Cold outreach packet saved to: {outreach_filepath}")
+    except Exception as e:
+        state.log(f"Cold outreach generation warning: {e}")
+
+    # Step 8: Persist Application Packet to Disk
     filepath = save_application_packet(state, output_dir=output_dir)
     state.output_path = filepath
     state.log(f"Complete application packet saved to: {filepath}")

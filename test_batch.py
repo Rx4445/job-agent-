@@ -99,10 +99,15 @@ class TestBatchProcessing(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(results[1].decision, "ABORTED")
         self.assertEqual(results[1].match.match_score, 0.0)
 
+    @patch("batch.save_outreach_packet", return_value="applications/outreach.md")
+    @patch("batch.async_generate_outreach", new_callable=AsyncMock)
     @patch("batch.save_application_packet", return_value="applications/sample.md")
     @patch("batch.async_generate_audited_cover_letter", new_callable=AsyncMock)
-    async def test_generate_batch_applications(self, mock_generate_letter, mock_save_packet):
+    async def test_generate_batch_applications(
+        self, mock_generate_letter, mock_save_packet, mock_outreach, mock_save_outreach
+    ):
         mock_generate_letter.return_value = ("Cover letter body...", [])
+        mock_outreach.return_value = "Mock Outreach Object"
         job = JobPosting(title="AI Eng", company="Nexus", skills=["Python"])
         match = MatchResult(
             field_match=True, match_score=100.0, matching_skills=["Python"], missing_skills=[], is_recommended=True
@@ -114,8 +119,11 @@ class TestBatchProcessing(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(paths), 1)
         self.assertEqual(res.cover_letter, "Cover letter body...")
         self.assertEqual(res.output_path, "applications/sample.md")
+        self.assertEqual(res.outreach_path, "applications/outreach.md")
         mock_generate_letter.assert_called_once()
         mock_save_packet.assert_called_once()
+        mock_outreach.assert_called_once()
+        mock_save_outreach.assert_called_once()
 
     @patch("batch.generate_batch_applications", new_callable=AsyncMock)
     @patch("batch.evaluate_batch_jobs")

@@ -84,11 +84,21 @@ async def main():
     print(f"Final Decision: {state.decision}")
     if state.decision == "APPROVED":
         print(f"Application Packet: {state.output_path}")
+        if state.outreach_path:
+            print(f"Cold Outreach Packet: {state.outreach_path}")
         if state.cover_letter:
             print("\n" + "-" * 70)
             print("TAILORED COVER LETTER PREVIEW:")
             print("-" * 70)
             print(state.cover_letter)
+            print("-" * 70)
+        if state.outreach_draft:
+            print("\n" + "-" * 70)
+            print("COLD EMAIL DRAFT PREVIEW:")
+            print("-" * 70)
+            subject = state.outreach_draft.subject_lines[0] if state.outreach_draft.subject_lines else "Cold Outreach"
+            print(f"Subject: {subject}\n")
+            print(state.outreach_draft.email_body)
             print("-" * 70)
     elif state.decision == "ABORTED":
         print("Application was aborted. No files were written.")

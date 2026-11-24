@@ -6,6 +6,7 @@ from extract import JobPosting, async_extract_job
 from resume import Resume, async_extract_resume                                                   
 from matcher import MatchResult, match_job_and_resume                                             
 from auditor import async_generate_audited_cover_letter                                                 
+from outreach import async_generate_outreach, save_outreach_packet
 from db import init_db, save_job, compute_resume_hash, get_candidate_profile,save_candidate_profile                                                                            
 from agent import load_resume_text, save_application_packet, AgentState                           
                                                                                                     
@@ -16,6 +17,7 @@ class BatchJobResult:
     match: MatchResult                                                                            
     decision: str  # "APPROVED", "REVIEW", "ABORTED"                                              
     cover_letter: str | None = None                                                               
+    outreach_path: str | None = None
     output_path: str | None = None                                                                
                                                                                                     
 def scan_job_files(directory: str) -> list[tuple[str, str]]:
@@ -142,6 +144,17 @@ async def generate_batch_applications(
         print(f"  -> Drafting and auditing letter for '{res.job.title}' at '{res.job.company}'...")
         res.cover_letter, audit_history = await async_generate_audited_cover_letter(res.job, res.match, resume_text)
 
+        outreach_draft = None
+        outreach_path = None
+        try:
+            print(f"  -> Drafting recruiter cold outreach for '{res.job.title}'...")
+            outreach_draft = await async_generate_outreach(res.job, res.match, resume_text)
+            outreach_path = save_outreach_packet(outreach_draft, output_dir=output_dir)
+            res.outreach_path = outreach_path
+            print(f"     Outreach Saved: {outreach_path}")
+        except Exception as e:
+            print(f"     [Warning] Outreach generation skipped: {e}")
+
         state = AgentState(
             posting_text="",
             resume_text=resume_text,
@@ -151,6 +164,8 @@ async def generate_batch_applications(
             decision=res.decision,
             cover_letter=res.cover_letter,
             audit_history=audit_history,
+            outreach_draft=outreach_draft,
+            outreach_path=outreach_path,
         )
         filepath = save_application_packet(state, output_dir=output_dir)
         res.output_path = filepath

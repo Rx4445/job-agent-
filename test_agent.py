@@ -9,6 +9,7 @@ from resume import Resume
 from agent import AgentState, evaluate_decision_gate, run_job_agent, save_application_packet
 from matcher import MatchResult
 from auditor import AuditCritique
+from outreach import OutreachDraft
 
 
 class TestJobAgent(unittest.IsolatedAsyncioTestCase):
@@ -33,10 +34,20 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
             tone_rating="authentic",
             critique_notes="Well grounded on resume facts.",
         )
+        self.sample_outreach = OutreachDraft(
+            company="Nexus AI",
+            role="AI Systems Engineer",
+            subject_lines=["Nexus AI Systems role + RAG pipelines"],
+            hook="Saw Nexus AI is scaling production RAG pipelines.",
+            proof_points=["Built RAG pipeline across 10k docs."],
+            email_body="Hi Alex,\n\nSaw Nexus AI is expanding...\n\nBest,\nAarya",
+            linkedin_dm="Hi Alex - saw your team at Nexus AI. Open to a quick chat?",
+        )
 
     def tearDown(self):
         shutil.rmtree(self.test_dir, ignore_errors=True)
 
+    @patch("agent.async_generate_outreach", new_callable=AsyncMock)
     @patch("agent.save_candidate_profile")
     @patch("agent.get_candidate_profile", return_value=None)
     @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
@@ -44,11 +55,12 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
     async def test_auto_approval_on_high_match(
-        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter, mock_get_profile, mock_save_profile
+        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter, mock_get_profile, mock_save_profile, mock_outreach
     ):
         mock_extract_job.return_value = self.sample_job
         mock_extract_resume.return_value = self.sample_resume
         mock_generate_letter.return_value = ("Dear Nexus AI Team, I built a RAG system...", [self.sample_critique])
+        mock_outreach.return_value = self.sample_outreach
 
         state = await run_job_agent(
             posting_text="Job posting text...",
@@ -60,10 +72,13 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(state.decision, "APPROVED")
         self.assertIsNotNone(state.cover_letter)
         self.assertIsNotNone(state.output_path)
+        self.assertIsNotNone(state.outreach_path)
         self.assertTrue(os.path.exists(state.output_path))
+        self.assertTrue(os.path.exists(state.outreach_path))
         self.assertEqual(len(state.audit_history), 1)
         self.assertEqual(state.audit_history[0].score, 9)
         mock_generate_letter.assert_called_once()
+        mock_outreach.assert_called_once()
         mock_save.assert_called_once()
 
     @patch("builtins.input", return_value="n")
@@ -97,6 +112,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(state.output_path)
         mock_generate_letter.assert_not_called()
 
+    @patch("agent.async_generate_outreach", new_callable=AsyncMock)
     @patch("builtins.input", return_value="y")
     @patch("agent.save_candidate_profile")
     @patch("agent.get_candidate_profile", return_value=None)
@@ -105,7 +121,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
     async def test_decision_gate_moderate_fit_approved(
-        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter, mock_get_profile, mock_save_profile, mock_input
+        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter, mock_get_profile, mock_save_profile, mock_input, mock_outreach
     ):
         # 2 of 4 skills = 50%
         mock_extract_job.return_value = self.sample_job
@@ -116,6 +132,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
             skills=["Python", "RAG"],
         )
         mock_generate_letter.return_value = ("Cover letter text...", [self.sample_critique])
+        mock_outreach.return_value = self.sample_outreach
 
         state = await run_job_agent(
             posting_text="Job posting text...",
@@ -168,13 +185,14 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(state.decision, "ABORTED")
         self.assertTrue(any("Failed to load resume" in log for log in state.logs))
 
+    @patch("agent.async_generate_outreach", new_callable=AsyncMock)
     @patch("agent.get_candidate_profile")
     @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
     @patch("agent.async_extract_resume", new_callable=AsyncMock)
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
     async def test_resume_cache_hit_skips_llm_extraction(
-        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter, mock_get_profile
+        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter, mock_get_profile, mock_outreach
     ):
         mock_extract_job.return_value = self.sample_job
         mock_get_profile.return_value = {
@@ -184,6 +202,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
             "skills": ["Python", "RAG", "Vector DBs"],
         }
         mock_generate_letter.return_value = ("Cover letter text...", [self.sample_critique])
+        mock_outreach.return_value = self.sample_outreach
 
         state = await run_job_agent(
             posting_text="Job posting text...",
@@ -198,6 +217,7 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
         mock_extract_resume.assert_not_called()
         self.assertTrue(any("Loaded candidate profile from cache (0ms)" in log for log in state.logs))
 
+    @patch("agent.async_generate_outreach", new_callable=AsyncMock)
     @patch("agent.save_candidate_profile")
     @patch("agent.get_candidate_profile", return_value=None)
     @patch("agent.async_generate_audited_cover_letter", new_callable=AsyncMock)
@@ -205,11 +225,12 @@ class TestJobAgent(unittest.IsolatedAsyncioTestCase):
     @patch("agent.async_extract_job", new_callable=AsyncMock)
     @patch("agent.save_job")
     async def test_resume_cache_miss_calls_gemini_and_saves_profile(
-        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter, mock_get_profile, mock_save_profile
+        self, mock_save, mock_extract_job, mock_extract_resume, mock_generate_letter, mock_get_profile, mock_save_profile, mock_outreach
     ):
         mock_extract_job.return_value = self.sample_job
         mock_extract_resume.return_value = self.sample_resume
         mock_generate_letter.return_value = ("Cover letter text...", [self.sample_critique])
+        mock_outreach.return_value = self.sample_outreach
 
         state = await run_job_agent(
             posting_text="Job posting text...",
