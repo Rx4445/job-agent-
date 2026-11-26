@@ -10,18 +10,18 @@ Tracking active engineering hours, feature delivery velocity, test suite growth,
 ```mermaid
 xychart-beta
     title "Active Engineering Session Hours"
-    x-axis ["Nov 11 (S1)", "Nov 12 (S2)", "Nov 14 (S3)", "Nov 15 (S4)", "Nov 16 (S5)", "Nov 17 (S6)", "Nov 20 (S7)", "Nov 21 (S8)", "Nov 22 (S9)", "Nov 23 (S10)", "Nov 24 (S11)", "Nov 24 (S12)", "Nov 24 (S13)", "Nov 25 (S14)", "Nov 25 (S15)", "Nov 26 (S16)", "Nov 26 (S17)"]
+    x-axis ["Nov 11 (S1)", "Nov 12 (S2)", "Nov 14 (S3)", "Nov 15 (S4)", "Nov 16 (S5)", "Nov 17 (S6)", "Nov 20 (S7)", "Nov 21 (S8)", "Nov 22 (S9)", "Nov 23 (S10)", "Nov 24 (S11)", "Nov 24 (S12)", "Nov 24 (S13)", "Nov 25 (S14)", "Nov 25 (S15)", "Nov 26 (S16)", "Nov 26 (S17)", "Nov 26 (S18)"]
     y-axis "Active Hours" 0 --> 6
-    bar [1.5, 3.1, 2.0, 4.5, 0.9, 1.8, 2.2, 2.5, 2.4, 0.2, 0.3, 0.2, 0.2, 0.8, 0.3, 0.5, 0.2]
+    bar [1.5, 3.1, 2.0, 4.5, 0.9, 1.8, 2.2, 2.5, 2.4, 0.2, 0.3, 0.2, 0.2, 0.8, 0.3, 0.5, 0.2, 0.6]
 ```
 
 ### 2. Automated Test Suite Reliability Growth
 ```mermaid
 xychart-beta
     title "Automated Unit Tests Passing (Fast & Free Mocks)"
-    x-axis ["V1", "Stage 2", "Stage 3", "Stage 4", "Stage 5", "Stage 6", "Stage 7", "Stage 8", "Stage 9", "Stage 10", "Stage 11", "Stage 12"]
+    x-axis ["V1", "Stage 2", "Stage 3", "Stage 4", "Stage 5", "Stage 6", "Stage 7", "Stage 8", "Stage 9", "Stage 10", "Stage 11", "Stage 12", "PDF Gen"]
     y-axis "Tests Passing" 0 --> 100
-    line [5, 15, 24, 38, 46, 53, 64, 72, 77, 83, 89, 92]
+    line [5, 15, 24, 38, 46, 53, 64, 72, 77, 83, 89, 92, 96]
 ```
 
 ### 3. Full 12-Stage Roadmap Progress
@@ -43,6 +43,23 @@ xychart-beta
 ---
 
 ## Session History Log
+
+### Session #18 — Nov 26, 2026 (Branching Strategy & ATS Resume PDF Generator)
+- **Time Window:** Nov 26 14:06 – 14:43 IST
+- **Active Duration:** **37 minutes** (0.62 hrs)
+- **Session Capacity:** Weekday Focused Sprint (~3 hours)
+- **Planned Target:** Create feature branch `feature/resume-pdf-generator`, implement Markdown-to-PDF resume compiler, enforce ATS single-column rules, and write unit tests.
+- **Accomplished:**
+  - Created isolated feature branch `feature/resume-pdf-generator`.
+  - Implemented `pdf_generator.py` converting Markdown formatting into ReportLab single-column flowables with Helvetica typography.
+  - Built unit test suite `test_pdf_generator.py` (4 tests). Project test suite expanded to **96 automated unit tests** passing in ~1.0s.
+  - Successfully compiled live `applications/Aarya_Pradhan_Resume.pdf` (2 pages, 3,754 characters, ATS verified).
+  - Authored architecture documentation in `docs/resume_pdf_generator.md`.
+- **Scope Velocity:** **100% of feature branch targets achieved**.
+- **Test Suite:** **96 / 96 passing** (100% passing in ~1.00s).
+- **Roadmap Completion:** **100.0% + PDF Generator Extension**.
+
+---
 
 ### Session #17 — Nov 26, 2026 (Real-World Pipeline Review & Job Application Strategy)
 - **Time Window:** Nov 26 13:45 – 13:55 IST
